@@ -8,8 +8,8 @@
   font-family:'Roboto', sans-serif;
   text-align: center;
 }
-
 .navbar-text {
+
   font-size: 200%;
   margin: 40px 20px 0 0;
 }
@@ -74,13 +74,6 @@
   margin: 25px;
 }
 
-.wrapper{
-  display: flex;
-  width: 260px;
-  flex-flow: row;
-  margin: 0 0 0 20px;
-}
-
 .tech-description {
   padding-left: 10px;
 }
@@ -99,11 +92,6 @@
     content:"";
   }
 
-}
-
-.img-title{
-  height: 90px;
-  width: 90px;
 }
 
 .text-title{
