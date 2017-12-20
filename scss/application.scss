@@ -1,10 +1,11 @@
 
+
+@import url('https://fonts.googleapis.com/css?family=Roboto');
 @import 'variables';
 @import 'equalizer';
 
-
-
 .centered{
+  font-family:'Roboto', sans-serif;
   text-align: center;
 }
 
@@ -14,7 +15,7 @@
 }
 
 .img-navbar{
-  margin: 0 0 0 20px;
+  margin-left: 20px;
 }
 
 .img-tech-logo{
@@ -31,12 +32,24 @@
   box-shadow: 0px 15px 20px rgba(0,0,0,.1);
   display: flex;
   justify-content: space-between;
+  background-color: white;
+}
+
+.sticky {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  z-index: 5;
 }
 
 .card-container{
   display: flex;
   flex-flow: row;
-  margin: 0 0 50px 200px;
+  align-items: center;
+  //margin: 0 0 50px 200px;
+  max-width: 1200px;
+  width: 100%;
+  margin: 50px 200px auto;
 }
 
 .wrapper{
@@ -49,7 +62,6 @@
 .background-card{
   border:1px solid #BED23C;
   border-radius: 10px;
-  font-family:'Roboto';
   display: flex;
   justify-content: space-around;
   flex-direction: column;
@@ -80,7 +92,16 @@
 .title{
   display: flex;
   flex-direction: row;
-  padding: 100px 30px 30px 150px;
+  padding: 150px 30px 30px 150px;
+
+  &::before{
+    background-image: url(assets/triangle.svg);
+    background-size: 90px 90px;
+    display: inline-block;
+    width: 90px;
+    height: 90px;
+    content:"";
+  }
 
 }
 
@@ -102,6 +123,7 @@
   flex-direction: column;
   justify-content: space-around;
   align-items: center;
+  margin-top: 100px;
 }
 
 .footer-text{
@@ -127,4 +149,8 @@
 .copyright{
   background-color: $grey;
   text-align: right;
+}
+
+.bold {
+  font-weight: bold;
 }
