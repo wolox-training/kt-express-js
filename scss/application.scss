@@ -82,14 +82,22 @@
 }
 
 .title {
-  display: flex;
-  padding: 150px 30px 30px 150px;
 
-  &::before{
+  padding: 195px 30px 30px 150px;
+  margin-left: 50px;
+  font-size: $font-big;
+  position: relative;
+  z-index: 1;
+
+  &::after{
     background-image: url(assets/triangle.svg);
     background-size: 90px 90px;
+    position: absolute;
+    z-index: -1;
     width: 90px;
     height: 90px;
+    bottom: 5px;
+    left: 90px;
     content:'';
   }
 
@@ -98,12 +106,6 @@
 .img-title{
   height: 90px;
   width: 90px;
-}
-
-.text-title{
-  padding-top: 45px;
-  margin-left: -30px;
-  font-size: 200%;
 }
 
 .footer {
