@@ -38,6 +38,7 @@
 .card-container {
   display: grid;
   grid-template-columns: repeat(3, max-content);
+  justify-content: center;
   align-items: center;
   max-width: 1200px;
   width: 100%;
