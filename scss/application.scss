@@ -1,16 +1,9 @@
-
-
 @import url('https://fonts.googleapis.com/css?family=Roboto');
 @import 'variables';
 @import 'equalizer';
 
-.centered{
-  font-family:'Roboto', sans-serif;
-  text-align: center;
-}
-
 .navbar-text {
-  font-size: 200%;
+  font-size: $font-big;
   margin: 40px 20px 0 0;
 }
 
@@ -29,10 +22,10 @@
   height: 90px;
   -webkit-box-shadow:0px 1px 1px;
   -moz-box-shadow:0px 1px 1px;
-  box-shadow: 0px 15px 20px rgba(0,0,0,.1);
+  box-shadow: 0px 15px 20px $grey;
   display: flex;
   justify-content: space-between;
-  background-color: white;
+  background-color: $white;
 }
 
 .sticky {
@@ -59,7 +52,7 @@
   height: 370px;
   width: 220px;
   position: relative;
-  margin: 0 0 0 20px;
+  margin-left: 20px;
   z-index: 1;
 }
 
@@ -85,18 +78,24 @@
   padding-left: 10px;
 }
 
-.title{
-  display: flex;
-  flex-direction: row;
-  padding: 150px 30px 30px 150px;
+.title {
 
-  &::before{
+  padding: 195px 30px 30px 150px;
+  margin-left: 50px;
+  font-size: $font-big;
+  position: relative;
+  z-index: 1;
+
+  &::after{
     background-image: url(assets/triangle.svg);
     background-size: 90px 90px;
-    display: inline-block;
+    position: absolute;
+    z-index: -1;
     width: 90px;
     height: 90px;
-    content:"";
+    bottom: 5px;
+    left: 90px;
+    content:'';
   }
 
 }
@@ -106,44 +105,48 @@
   width: 90px;
 }
 
-.text-title{
-  padding-top: 45px;
-  margin-left: -30px;
-  font-size: 200%;
-}
-
 .footer {
   height: 30vh;
   background-color: $blue;
   display: flex;
   flex-direction: column;
-  justify-content: space-around;
+  justify-content: space-between;
   align-items: center;
   margin-top: 100px;
 }
 
+.footer-form{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+}
+
 .footer-text{
-  color: white;
-  font-size: 200%;
+  color: $white;
+  font-size: $font-big;
+  margin: 30px;
 }
 
 .footer-input {
-  width: 250px;
+  width: 320px;
   height:40px;
   border-radius: 5px;
 }
 
 .footer-button {
-  color: white;
+  color: $white;
   background-color: Transparent;
-  font-size: 150%;
-  border: 1px solid white;
+  font-size: $font-medium;
+  border: 1px solid $white;
   border-radius: 5px;
-  padding: 15px 20px 15px 20px;
+  margin: 30px;
+  padding: 15px 20px;
+  align-self: center;
 }
 
 .copyright{
   background-color: $grey;
+  width: 100%;
   text-align: right;
 }
 
