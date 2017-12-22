@@ -11,17 +11,8 @@
     grid-template-columns: repeat(1, max-content);
   }
 
-  .background-card{
-    display: flex;
-    justify-content: space-around;
+  .background-card:not(:last-child) {
     border-bottom: 1px solid $green;
-    flex-direction: column;
-    font-size: 14px;
-    height: 370px;
-    width: 220px;
-    position: relative;
-    margin-left: 20px;
-    z-index: 1;
   }
 
   .main-tech {
