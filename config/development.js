@@ -1,4 +1,4 @@
 exports.config = {
-  environment: 'development',
-  isDevelopment: true
+    environment: 'development',
+    isDevelopment: true
 };

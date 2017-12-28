@@ -1,4 +1,4 @@
 exports.config = {
-  environment: 'production',
-  isProduction: true
+    environment: 'production',
+    isProduction: true
 };

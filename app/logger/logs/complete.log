@@ -1,0 +1,9 @@
+11:17:06 - info: File: .keep does not match pattern: /\.js$/
+11:17:06 - error:  SequelizeHostNotFoundError: getaddrinfo ENOTFOUND host host:5432
+    at /home/ktemes/kt-express-js/node_modules/sequelize/lib/dialects/postgres/connection-manager.js:102:20
+    at Connection.<anonymous> (/home/ktemes/kt-express-js/node_modules/pg/lib/client.js:176:5)
+    at Connection.emit (events.js:159:13)
+    at Socket.<anonymous> (/home/ktemes/kt-express-js/node_modules/pg/lib/connection.js:59:10)
+    at Socket.emit (events.js:159:13)
+    at emitErrorNT (internal/streams/destroy.js:64:8)
+    at process._tickCallback (internal/process/next_tick.js:152:19)
