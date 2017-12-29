@@ -1,5 +1,5 @@
 // const controller = require('./controllers/controller');
-/*
+
 exports.init = (app) => {
 
     // app.get('/endpoint/get/path', [], controller.methodGET);
@@ -7,4 +7,3 @@ exports.init = (app) => {
     // app.post('/endpoint/post/path', [], controller.methodPOST);
 
 };
-*/

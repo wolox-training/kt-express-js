@@ -1,6 +1,5 @@
-// const model = require('./model/name');
-/*
+const usuario = require('./model/name');
+
 exports.define = (db) => {
-    // model.getModel(db);
+    model.getModel(db);
 };
-*/
