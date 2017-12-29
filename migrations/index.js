@@ -20,18 +20,22 @@ exports.check = () => {
             ],
             path: './migrations/migrations',
             pattern: /\.js$/
-        }
-    });
-    return umzug.pending().then(migrations => {
-        if (migrations.length) {
-            if (config.isDevelopment) {
-                return Promise.reject('Pending migrations, run: npm run migrations');
-            } else {
-                return umzug.up().catch(err => {
-                    logger.error(err);
-                    return Promise.reject('There are pending migrations that could not be executed');
-                });
-            }
-        }
-    });
+        },
+      
+      path: './migrations/migrations',
+      pattern: /\.js$/
+    
+  });
+  return umzug.pending().then(migrations => {
+    if (migrations.length) {
+      if (config.isDevelopment) {
+        return Promise.reject('Pending migrations, run: npm run migrations');
+      } else {
+        return umzug.up().catch(err => {
+          logger.error(err);
+          return Promise.reject('There are pending migrations that could not be executed');
+        });
+      }
+    }
+  });
 };
