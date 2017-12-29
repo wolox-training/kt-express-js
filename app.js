@@ -1,15 +1,15 @@
 const express = require('express'),
-    bodyParser = require('body-parser'),
-    Rollbar = require('rollbar'),
-    morgan = require('morgan'),
-    path = require('path'),
-    config = require('./config'),
-    routes = require('./app/routes'),
-    errors = require('./app/middlewares/errors'),
-    migrationsManager = require('./migrations'),
-    logger = require('./app/logger'),
-    DEFAULT_BODY_SIZE_LIMIT = 1024 * 1024 * 10,
-    DEFAULT_PARAMETER_LIMIT = 10000;
+  bodyParser = require('body-parser'),
+  Rollbar = require('rollbar'),
+  morgan = require('morgan'),
+  path = require('path'),
+  config = require('./config'),
+  routes = require('./app/routes'),
+  errors = require('./app/middlewares/errors'),
+  migrationsManager = require('./migrations'),
+  logger = require('./app/logger'),
+  DEFAULT_BODY_SIZE_LIMIT = 1024 * 1024 * 10,
+  DEFAULT_PARAMETER_LIMIT = 10000;
 
 const bodyParserJsonConfig = () => ({
   parameterLimit: config.common.api.parameterLimit || DEFAULT_PARAMETER_LIMIT,
@@ -42,14 +42,14 @@ const init = () => {
     );
   }
 
-    Promise.resolve()
-        .then(() => {
-            if (!config.isTesting) {
-                return migrationsManager.check();
-            }
-        })
-        .then(() => {
-            routes.init(app);
+  Promise.resolve()
+    .then(() => {
+      if (!config.isTesting) {
+        return migrationsManager.check();
+      }
+    })
+    .then(() => {
+      routes.init(app);
 
       app.use(errors.handle);
 

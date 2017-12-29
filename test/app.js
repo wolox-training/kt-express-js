@@ -1,12 +1,12 @@
 'use strict';
 
 const fs = require('fs'),
-    path = require('path'),
-    chai = require('chai'),
-    chaiHttp = require('chai-http'),
-    Sequelize = require('sequelize'),
-    models = require('../app/models'),
-    dataCreation = require('./../app/models/scripts/dataCreation');
+  path = require('path'),
+  chai = require('chai'),
+  chaiHttp = require('chai-http'),
+  Sequelize = require('sequelize'),
+  models = require('../app/models'),
+  dataCreation = require('./../app/models/scripts/dataCreation');
 
 chai.use(chaiHttp);
 
