@@ -1,2 +1,5 @@
 css/
 .sass-cache/
+config/.env
+node_modules/
+app/logger/logs/
