@@ -6,7 +6,7 @@ module.exports = {
         "node": true,
         "mocha": true
     },
-    "extends": "eslint:recommended",
+    //"extends": "eslint:recommended",
     "parserOptions": {
         "ecmaVersion": 8,
         "ecmaFeatures": {
@@ -17,7 +17,7 @@ module.exports = {
     "rules": {
         "indent": [
             "error",
-            4
+            2
         ],
         "linebreak-style": [
             "error",

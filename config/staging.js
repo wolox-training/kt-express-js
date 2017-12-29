@@ -1,4 +1,4 @@
 exports.config = {
-    environment: 'staging',
-    isStage: true
+  environment: 'staging',
+  isStage: true
 };
