@@ -1,5 +1,5 @@
 'use strict';
-module.exports = function(sequelize, DataTypes) {
+module.exports = (sequelize, DataTypes) => {
   var user = sequelize.define('users', {
     name: DataTypes.STRING,
     lastName: DataTypes.STRING,
