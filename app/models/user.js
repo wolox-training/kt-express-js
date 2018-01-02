@@ -1,12 +1,8 @@
 'use strict';
-<<<<<<< HEAD
 
 const bcrypt = require('bcrypt-nodejs');
 
 module.exports = function(sequelize, DataTypes) {
-=======
-module.exports = (sequelize, DataTypes) => {
->>>>>>> master
   var user = sequelize.define('users', {
     name: {
       type: DataTypes.STRING, 

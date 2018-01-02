@@ -24,7 +24,7 @@ exports.create = (req, res, next) => {
   }).then(result => {
     let message = `User ${input.name} created successfully.`;
     logger.info(message);
-    res.status(200).send(message);
+    res.status(201).send(result);
 
   }).catch(error => {
 
@@ -34,7 +34,7 @@ exports.create = (req, res, next) => {
         errorBag.push(error.errors[i].message);
       }
       logger.error(`A database error occured when attempting a user signup. Details: ${errorBag}.`);
-      res.status(500).send(errorBag);
+      res.status(200).send(errorBag);
     }else{
       logger.error(`Unhandled error! details: ${error}`);
       res.status(500).send(error);
