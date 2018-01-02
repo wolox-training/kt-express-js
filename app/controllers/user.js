@@ -1,4 +1,4 @@
-const userModel = require('../models/user'),
+const User = require('../models').users,
   errors = require('../errors'),
   path = require('path');
 
@@ -12,28 +12,42 @@ exports.signup = (req, res, next) => {
 };
 
 exports.create = (req, res, next) => {
-  
-  res.status(200);
 
-  let validation = validateInput(req.body);
+  let input = emptyToNull(req.body);
 
-  res.send('OK!');
+  User.create({
+    name: input.name,
+    lastName: input.lastName,
+    email: input.email,
+    password: input.password
+  }).then(result => {
+
+    res.status(200).send('OK');
+
+  }).catch(error => {
+
+    let errorBag = [];
+
+    for(i = 0; i< error.errors.length; i++){
+
+      errorBag.push(error.errors[i].message);
+
+    }
+
+    res.status(200).send(errorBag);
+
+  });
   
 };
 
-const validateInput = (input) => {
+const emptyToNull = (input) => {
 
-  let errors = null;
+  for (let key in input){
 
-  input.forEach(element => {
-    
-    if(typeof(element) == 'undefined' || element === ''){
-      
-      errors = 'All fields are required!';
-      
-      return errors;
-    }
+    input[key] = input[key] === '' ? null : input[key];
+  
+  }
 
-  });
+  return input;
 
 };
