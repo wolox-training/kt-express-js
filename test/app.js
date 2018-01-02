@@ -6,22 +6,17 @@ const fs = require('fs'),
   chaiHttp = require('chai-http'),
   Sequelize = require('sequelize'),
   models = require('../app/models'),
-  orm = require('./../app/orm'),
   dataCreation = require('./../app/models/scripts/dataCreation');
 
 chai.use(chaiHttp);
 
-const db = new Sequelize(orm.DB_URL, { logging: false });
-
 beforeEach('drop tables, re-create them and populate sample data', done => {
-  models.define(db);
-  db
-    .sync({ force: true })
-    .then(() => dataCreation.execute(db))
-    .then(() => {
-      exports.models = db.models;
-      done();
-    });
+  const promises = Object.keys(models)
+    .filter(modelName => modelName !== 'sequelize' && modelName !== 'Sequelize')
+    .map(modelName => models[modelName].destroy({ force: true, where: {} }));
+  Promise.all(promises)
+    .then(() => dataCreation.execute())
+    .then(() => done());
 });
 
 // including all test files

@@ -1,24 +1,19 @@
 const Umzug = require('umzug'),
   Sequelize = require('sequelize'),
   config = require('./../config/'),
-  orm = require('../app/orm'),
   logger = require('../app/logger'),
-  errors = require('../app/errors');
+  errors = require('../app/errors'),
+  sequelize = require('../app/models').sequelize;
 
 exports.check = () => {
-  const db = new Sequelize(orm.DB_URL, {
-    logging: config.isDevelopment ? logger.info : false
-  });
   const umzug = new Umzug({
     logging: logger.info,
     storage: 'sequelize',
-    storageOptions: {
-      sequelize: db
-    },
+    storageOptions: { sequelize },
     migrations: {
       params: [
-        db.getQueryInterface(),
-        db.constructor,
+        sequelize.getQueryInterface(),
+        sequelize.constructor,
         function() {
           throw new Error('Migration tried to use old style "done" callback.upgrade');
         }

@@ -3,3 +3,4 @@ css/
 config/.env
 node_modules/
 app/logger/logs/
+.vscode/
