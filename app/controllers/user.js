@@ -1,5 +1,6 @@
 const User = require('../models').users,
   errors = require('../errors'),
+  logger = require('../logger'),
   path = require('path');
 
 
@@ -21,20 +22,23 @@ exports.create = (req, res, next) => {
     email: input.email,
     password: input.password
   }).then(result => {
-
-    res.status(200).send('OK');
+    let message = `User ${input.name} created successfully.`;
+    logger.info(message);
+    res.status(200).send(message);
 
   }).catch(error => {
 
     let errorBag = [];
-
-    for(i = 0; i< error.errors.length; i++){
-
-      errorBag.push(error.errors[i].message);
-
+    if(error.errors){
+      for(i = 0; i< error.errors.length; i++){
+        errorBag.push(error.errors[i].message);
+      }
+      logger.error(`A database error occured when attempting a user signup. Details: ${errorBag}.`);
+      res.status(500).send(errorBag);
+    }else{
+      logger.error(`Unhandled error! details: ${error}`);
+      res.status(500).send(error);
     }
-
-    res.status(200).send(errorBag);
 
   });
   
