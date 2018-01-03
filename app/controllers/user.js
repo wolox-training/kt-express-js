@@ -1,7 +1,7 @@
 const User = require('../models').users,
   errors = require('../errors'),
   logger = require('../logger'),
-  path = require('path');
+  session = require('client-sessions');
 
 
 exports.signup = (req, res, next) => {
@@ -42,6 +42,46 @@ exports.create = (req, res, next) => {
 
   });
   
+};
+
+exports.signin = (req, res, next) => {
+
+  let input = emptyToNull(req.body);
+
+  if(!input.email || !input.password){
+    return res.status(400).send('Both email and password are required to continue');
+  }
+  if (req.session && req.session.user && req.session.user.email === input.email){
+    return res.status(200).send('You are already logged in!');
+    
+  }
+
+  User.findOne({
+    where: {
+      email: input.email
+    }
+  }).then(result => {
+    
+    if(!result || !result.email){
+      logger.info(`Login attempt with invalid email: "${input.email}"`);
+      return res.status(404).send('The provided email does not exist in our database!');
+    }
+
+    if(!result.validPassword(input.password)){
+      logger.info(`Failed login attempt to account with email "${input.email}", invalid password`);
+      return res.status(401).send('Invalid password');
+    }
+    
+    req.session.user = result;
+    logger.info(`User ${result.email} successfully logged in`);
+    res.status(200).send(`User ${result.name} logged in correctly!`);
+
+  }).catch(error => {
+    console.log(error);
+    logger.error(`Unhandled error! details: ${error}`);
+    return next();
+  });
+
 };
 
 const emptyToNull = (input) => {

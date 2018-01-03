@@ -8,6 +8,7 @@ const express = require('express'),
   errors = require('./app/middlewares/errors'),
   migrationsManager = require('./migrations'),
   logger = require('./app/logger'),
+  session = require('client-sessions'),
   DEFAULT_BODY_SIZE_LIMIT = 1024 * 1024 * 10,
   DEFAULT_PARAMETER_LIMIT = 10000;
 
@@ -32,6 +33,13 @@ const init = () => {
   // Client must send "Content-Type: application/json" header
   app.use(bodyParser.json(bodyParserJsonConfig()));
   app.use(bodyParser.urlencoded(bodyParserUrlencodedConfig()));
+
+  app.use(session({
+    cookieName: 'session',
+    secret: 'super_secret_random_string',
+    duration: 30 * 60 * 1000,
+    activeDuration: 5 * 60 * 1000,
+  }));
 
   if (!config.isTesting) {
     morgan.token('req-params', req => req.params);

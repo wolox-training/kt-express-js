@@ -49,6 +49,11 @@ module.exports = function(sequelize, DataTypes) {
         // associations can be defined here
       },
     },
+    instanceMethods: {
+      validPassword(password) {
+        return bcrypt.compareSync(password, this.password);
+      }
+    },
     hooks: {
       afterValidate: (user, options) => {
         user.password = bcrypt.hashSync(user.password, bcrypt.genSaltSync(8), null);
