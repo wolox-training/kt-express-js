@@ -5,6 +5,7 @@ let chai = require('chai'),
   chaiHttp = require('chai-http'),
   server = require('../app'),
   should = chai.should(),
+  dictum = require('dictum.js'),
   User = require('../app/models').users;
 
 chai.use(chaiHttp);
@@ -34,6 +35,7 @@ describe('User', () => {
           if(err) done(err);
           res.should.have.status(201);
           res.body.should.include({name: 'Kevin', lastName: 'Temes', email: 'kevin.temes@wolox.com.ar'});
+          dictum.chai(res, 'description for endpoint');
           done();
         });
     });
@@ -71,6 +73,26 @@ describe('User', () => {
           if(err) done(err);
           res.should.have.status(200);
           res.body.should.include('Passwords must contain at least 8 characters.');
+          done();
+        });
+    });
+
+    it('it should throw an error when attempting to POST a user with null or empty fields', (done) => {
+
+      let emptyUser = {
+        name: '',
+        lastName: null,
+        email: null,
+        password: ''
+      };
+  
+      chai.request(server)
+        .post('/users')
+        .send(emptyUser)
+        .end((err, res) => {
+          if(err) done(err);
+          res.should.have.status(200);
+          res.body.should.include('name cannot be null', 'lastName cannot be null', 'password cannot be null', 'email cannot be null');
           done();
         });
     });
