@@ -194,6 +194,109 @@ describe('User', () => {
     });
 
   });
+
+  /*
+  * Testing the /users/list (POST) route
+    */
+  describe('/POST users/list', () => {
+
+    let userOne = {
+      name: 'userOne',
+      lastName: 'userOne',
+      email: 'userOne@userOne.com',
+      password: '12345678'
+    };
+
+    let userTwo = {
+      name: 'userTwo',
+      lastName: 'userTwo',
+      email: 'userTwo@userTwo.com',
+      password: '12345678'
+    };
+
+    it('should return all users from the database', (done) => {
+
+      chai.request(server)
+        .post('/users')
+        .send(userOne)
+        .then((res) => {
+
+          chai.request(server)
+            .post('/users')
+            .send(userTwo)
+            .then((res) => {
+            
+              chai.request(server)
+                .get('/users/list')
+                .end((err, res) => {
+                  res.should.have.status(200);
+                  res.body.should.include(
+                    {name: 'userOne', lastName: 'userOne', email: 'userOne@userOne.com'}, 
+                    {name: 'userTwo', lastName: 'userTwo', email: 'userTwo@userTwo.com'}
+                  );
+                  dictum.chai(res, 'User list retrieval');
+                  done();
+                });
+
+            });
+
+        });
+
+    });
+
+    it('should return only the first user', (done) => {
+
+      chai.request(server)
+        .post('/users')
+        .send(userOne)
+        .then((res) => {
+
+          chai.request(server)
+            .post('/users')
+            .send(userTwo)
+            .then((res) => {
+            
+              chai.request(server)
+                .get('/users/list/0/1')
+                .end((err, res) => {
+                  res.should.have.status(200);
+                  res.body.should.include({name: 'userOne', lastName: 'userOne', email: 'userOne@userOne.com'});
+                  done();
+                });
+
+            });
+
+        });
+
+    });
+
+    it('should return only the second user', (done) => {
+
+      chai.request(server)
+        .post('/users')
+        .send(userOne)
+        .then((res) => {
+
+          chai.request(server)
+            .post('/users')
+            .send(userTwo)
+            .then((res) => {
+            
+              chai.request(server)
+                .get('/users/list/1/1')
+                .end((err, res) => {
+                  res.should.have.status(200);
+                  res.body.should.include({name: 'userTwo', lastName: 'userTwo', email: 'userTwo@userTwo.com'});
+                  done();
+                });
+
+            });
+
+        });
+
+    });
+
+  });
 });
 
 

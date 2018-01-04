@@ -6,4 +6,6 @@ exports.init = (app) => {
 
   app.post('/users/sessions', [], user.signin);
 
+  app.get('/users/list/:offset?/:limit?', [], user.list);
+
 };
