@@ -33,13 +33,13 @@ exports.create = (req, res, next) => {
 
 const emptyToNull = (input) => {
 
-  let newInput = [];
+  let newInput = {};
 
-  for (let key in input){
+  Object.keys(input).forEach((key) => {
 
     newInput[key] = input[key] === '' ? null : input[key];
   
-  }
+  });
 
   return newInput;
 

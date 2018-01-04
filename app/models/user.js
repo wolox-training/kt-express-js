@@ -2,7 +2,7 @@
 
 const bcrypt = require('bcrypt-nodejs');
 
-module.exports = function(sequelize, DataTypes) {
+module.exports = (sequelize, DataTypes) => {
   var user = sequelize.define('users', {
     name: {
       type: DataTypes.STRING, 
@@ -31,7 +31,14 @@ module.exports = function(sequelize, DataTypes) {
       isEmail: true,
       allowNull:false,
       unique:true,
-      notEmpty: true
+      notEmpty: true,
+      validate: {
+        woloxMail(value) {
+          if (!value.endsWith('@wolox.com.ar') && !value.endsWith('@wolox.com')){
+            throw new Error('The email provided is not a valid Wolox email.');
+          }
+        }
+      }
     }
   }, {
     classMethods: {
