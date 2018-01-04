@@ -1,20 +1,10 @@
 const User = require('../models').users,
   errors = require('../errors'),
-  logger = require('../logger'),
-  path = require('path');
-
-
-exports.signup = (req, res, next) => {
-
-  res.status(200);
-  
-  res.sendFile(path.resolve('app/views/user/signup.html'));
-
-};
+  logger = require('../logger');
 
 exports.create = (req, res, next) => {
 
-  let input = emptyToNull(req.body);
+  const input = emptyToNull(req.body);
 
   User.create({
     name: input.name,
@@ -22,19 +12,16 @@ exports.create = (req, res, next) => {
     email: input.email,
     password: input.password
   }).then(result => {
-    let message = `User ${input.name} created successfully.`;
-    logger.info(message);
-    res.status(200).send(message);
+    logger.info(`User ${input.name} created successfully.`);
+    res.status(200).send(`User ${input.name} created successfully.`);
 
   }).catch(error => {
 
     let errorBag = [];
     if(error.errors){
-      for(i = 0; i< error.errors.length; i++){
-        errorBag.push(error.errors[i].message);
-      }
+      errorBag = error.errors.map(err => err.message);
       logger.error(`A database error occured when attempting a user signup. Details: ${errorBag}.`);
-      res.status(500).send(errorBag);
+      res.status(401).send(errorBag);
     }else{
       logger.error(`Unhandled error! details: ${error}`);
       res.status(500).send(error);
@@ -46,12 +33,14 @@ exports.create = (req, res, next) => {
 
 const emptyToNull = (input) => {
 
+  let newInput = [];
+
   for (let key in input){
 
-    input[key] = input[key] === '' ? null : input[key];
+    newInput[key] = input[key] === '' ? null : input[key];
   
   }
 
-  return input;
+  return newInput;
 
 };

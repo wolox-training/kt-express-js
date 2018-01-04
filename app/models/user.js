@@ -1,12 +1,8 @@
 'use strict';
-<<<<<<< HEAD
 
 const bcrypt = require('bcrypt-nodejs');
 
 module.exports = function(sequelize, DataTypes) {
-=======
-module.exports = (sequelize, DataTypes) => {
->>>>>>> master
   var user = sequelize.define('users', {
     name: {
       type: DataTypes.STRING, 
@@ -20,6 +16,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     password: {
       type: DataTypes.STRING, 
+      isAlphanumeric: true,
       allowNull:false,
       notEmpty: true,
       validate: {
@@ -34,18 +31,7 @@ module.exports = (sequelize, DataTypes) => {
       isEmail: true,
       allowNull:false,
       unique:true,
-      notEmpty: true,
-      isUnique: function(value, next) {
-        user.find({where: {email: value}, attributes: ['id']})
-          .done(function(error, user) {
-            if (error){
-              return next(error);
-            }
-            if (user){
-            }
-            next();
-          });
-      }
+      notEmpty: true
     }
   }, {
     classMethods: {
