@@ -20,7 +20,4 @@ beforeEach('drop tables, re-create them and populate sample data', done => {
 });
 
 // including all test files
-const normalizedPath = path.join(__dirname, '.');
-fs.readdirSync(normalizedPath).forEach(file => {
-  require(`./${file}`);
-});
+require('./controllers/user.js');
