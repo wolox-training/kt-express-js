@@ -32,13 +32,22 @@ exports.create = (req, res, next) => {
 
 exports.signin = (req, res, next) => {
 
+  try {
+    validationResult(req).throw();
+  } catch (err) {
+    let errors = {};
+    if(err.mapped().email){
+      errors.email = err.mapped().email.msg + ';';
+    }
+    if(err.mapped().password){
+      errors.password = err.mapped().password.msg;
+    }
+    return res.status(400).send(errors);
+     
+  }
+
   let input = emptyToNull(req.body);
 
-  let test = check('password').exists();
-
-  if(!input.email || !input.password){
-    return res.status(400).send('Both email and password are required to continue');
-  }
   if (req.headers.token){
 
     let token = jwt.decode(req.headers.token, secret);
@@ -89,3 +98,5 @@ const emptyToNull = (input) => {
   return newInput;
 
 };
+
+exports.validateLoginInput = [check('email').isEmail().withMessage('Email is invalid'), check('password', 'passwords must be at least 8 chars long').isLength({ min: 8 })];

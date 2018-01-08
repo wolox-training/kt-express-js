@@ -4,6 +4,6 @@ exports.init = (app) => {
   
   app.post('/users', [], user.create);
 
-  app.post('/users/sessions', [], user.signin);
+  app.post('/users/sessions', user.validateLoginInput, user.signin);
 
 };
