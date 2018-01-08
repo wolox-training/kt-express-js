@@ -88,19 +88,38 @@ exports.list = (req, res, next) => {
 
   let params = emptyToNull(req.params);
 
-  User.findAll({
-    attributes: ['name', 'lastName', 'email'],
-    offset: params.offset,
-    limit: params.limit ? params.limit : 10
-  })
-    .then(result => {
-      logger.info('User list requested.');
-      return res.status(200).send(result);
 
-    }).catch(err => {
-      logger.error(`Unexpected error occurred! Details: ${err}`);
-      return res.status(500).send(err);
-    });
+  if (!req.headers.token){
+    return res.status(401).send('You must be logged in to access this endpoint');
+  }
+
+  let token = jwt.decode(req.headers.token, secret);
+
+  User.findOne({
+    where: {
+      email: token.token
+    }
+  }).then(result => {
+
+    if(!result){
+      return res.status(401).send('Invalid credentials');
+    }
+
+    User.findAll({
+      attributes: ['name', 'lastName', 'email'],
+      offset: params.offset,
+      limit: params.limit ? params.limit : 10
+    })
+      .then(result => {
+        logger.info('User list requested.');
+        return res.status(200).send(result);
+  
+      }).catch(err => {
+        logger.error(`Unexpected error occurred! Details: ${err}`);
+        return res.status(500).send(err);
+      });
+
+  });
 
 };
 
