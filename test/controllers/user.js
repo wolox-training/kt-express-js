@@ -52,12 +52,30 @@ describe('/POST users', () => {
 
   });
 
+  it('Should throw an error when attempting to POST a user with an non-woloxer email', (done) => {
+
+    let userWithWrongEmail = {
+      name: 'Kevin',
+      lastName: 'Temes',
+      email: 'im.not.from.wolox@email.com',
+      password: '12345678'
+    };
+
+    chai.request(server)
+      .post('/users')
+      .send(userWithWrongEmail)
+      .catch(err => {
+        err.should.have.status(401);
+      }).then(() => done());
+
+  });
+
   it('Should throw an error when attempting to POST a user with an invalid password', (done) => {
 
     let userWithWrongPassword = {
       name: 'Kevin',
       lastName: 'Temes',
-      email: 'totally.real.email@email.com',
+      email: 'totally.real.email@wolox.com',
       password: '123'
     };
 

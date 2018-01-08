@@ -12,7 +12,7 @@ exports.create = (req, res, next) => {
     password: input.password
   }).then(result => {
     logger.info(`User ${input.name} created successfully.`);
-    res.status(200).send(`User ${input.name} created successfully.`);
+    res.status(201).send(result);
 
   }).catch(error => {
 
