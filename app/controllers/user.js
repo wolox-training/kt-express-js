@@ -34,11 +34,18 @@ exports.signin = (req, res, next) => {
 
   let input = emptyToNull(req.body);
 
+  let test = check('password').exists();
+
   if(!input.email || !input.password){
     return res.status(400).send('Both email and password are required to continue');
   }
-  if (req.session && req.session.user && req.session.user.email === input.email){
-    return res.status(200).send('You are already logged in!');
+  if (req.headers.token){
+
+    let token = jwt.decode(req.headers.token, secret);
+
+    if(token.token == input.email){
+      return res.status(200).send('You are already logged in!');
+    }
     
   }
 
@@ -48,9 +55,9 @@ exports.signin = (req, res, next) => {
     }
   }).then(result => {
     
-    if(!result || !result.email){
+    if(!result){
       logger.info(`Login attempt with invalid email: "${input.email}"`);
-      return res.status(404).send('The provided email does not exist in our database!');
+      return res.status(401).send('Database error');
     }
 
     if(!result.validPassword(input.password)){
@@ -58,14 +65,13 @@ exports.signin = (req, res, next) => {
       return res.status(401).send('Invalid password');
     }
     
-    req.session.user = result;
+    let token = jwt.encode({token: result.email}, secret);
     logger.info(`User ${result.email} successfully logged in`);
-    res.status(200).send(`User ${result.name} logged in correctly!`);
+    res.status(200).json(token);
 
   }).catch(error => {
-    console.log(error);
     logger.error(`Unhandled error! details: ${error}`);
-    return next();
+    return next(error);
   });
 
 };
