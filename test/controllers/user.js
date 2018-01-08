@@ -10,11 +10,6 @@ let chai = require('chai'),
 
 chai.use(chaiHttp);
 
-
-beforeEach((done) => {
-  User.destroy({where: {}}, (err) => {}).then(done());     
-});
-
 /*
 * Testing the /users (POST) route
 */
