@@ -108,7 +108,7 @@ describe('/POST users', () => {
 */
 describe('/POST users/sessions', () => {
 
-  let newUser = {
+  const newUser = {
     name: 'Kevin',
     lastName: 'Temes',
     email: 'kevin.temes@wolox.com.ar',
@@ -117,7 +117,7 @@ describe('/POST users/sessions', () => {
 
   it('should successfully log a user', (done) => {
 
-    let correctLogin = {
+    const correctLogin = {
       email: 'kevin.temes@wolox.com.ar',
       password: '12345678'
     };
@@ -125,14 +125,13 @@ describe('/POST users/sessions', () => {
     chai.request(server)
       .post('/users')
       .send(newUser)
-      .end((err, res) => {
+      .then(res => {
 
         chai.request(server)
           .post('/users/sessions')
           .send(correctLogin)
           .end((err, res) => {
             res.should.have.status(200);
-            res.res.text.should.equal(`User ${newUser.name} logged in correctly!`);
             dictum.chai(res, 'User signin');
             done();
           });
@@ -143,7 +142,7 @@ describe('/POST users/sessions', () => {
 
   it('should throw an error when attempting a login with empty or null email/password', (done) => {
 
-    let emptyLogin = {
+    const emptyLogin = {
       email: '',
       password: null
     };
@@ -152,7 +151,7 @@ describe('/POST users/sessions', () => {
       .post('/users/sessions')
       .send(emptyLogin)
       .catch(err => {
-        err.should.have.status(400);
+        err.should.have.status(401);
       })
       .then(() => done());
 
@@ -160,7 +159,7 @@ describe('/POST users/sessions', () => {
 
   it('should throw an error when attemping a login with an invalid email', (done) => {
 
-    let invalidEmail = {
+    const invalidEmail = {
       email: 'fake.email.@error.com',
       password: '12345678'
     };
@@ -169,7 +168,7 @@ describe('/POST users/sessions', () => {
       .post('/users/sessions')
       .send(invalidEmail)
       .catch(err => {
-        err.should.have.status(404);
+        err.should.have.status(401);
       })
       .then(() => done());
 
@@ -177,7 +176,7 @@ describe('/POST users/sessions', () => {
 
   it('should throw an error when attempting a login with an existing email but invalid password', (done) => {
 
-    let invalidPassword = {
+    const invalidPassword = {
       email: 'kevin.temes@wolox.com.ar',
       password: '87654321'
     };
