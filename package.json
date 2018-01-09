@@ -19,9 +19,9 @@
     "outdated": "npm outdated --depth 0",
     "pretest": "npm run lint",
     "prestart": "npm run lint",
-    "migrations": "./node_modules/.bin/sequelize --config ./migrations/config.js --migrations-path ./migrations/migrations db:migrate",
+    "migrations": "./node_modules/.bin/sequelize --config ./config/db.js --migrations-path ./migrations/migrations db:migrate",
     "start": "./node_modules/.bin/nodemon --inspect app.js",
-    "test": "node_modules/.bin/sequelize db:migrate && NODE_ENV=testing ./node_modules/mocha/bin/mocha --compilers js:babel-core/register test/app.js && npm run nsp",
+    "test": "npm run migrations && NODE_ENV=testing ./node_modules/mocha/bin/mocha --compilers js:babel-core/register test/app.js && npm run nsp",
     "test-inspect": "NODE_ENV=testing node --inspect --debug-brk ./node_modules/mocha/bin/_mocha --compilers js:babel-core/register test/app.js"
   },
   "cacheDirectories": [
