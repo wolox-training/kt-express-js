@@ -1,30 +1,55 @@
 const User = require('../models').users,
-  logger = require('../logger');
+  errors = require('../errors'),
+  logger = require('../logger'),
+  jwt = require('jwt-simple'),
+  secret = process.env.NODE_API_JWT_SECRET_STRING,
+  { check, validationResult } = require('express-validator/check'),
+  bcrypt = require('bcrypt'),
+  saltRounds = 8;
+
+
+exports.signup = (req, res, next) => {
+
+  res.status(200);
+  
+  res.sendFile(path.resolve('app/views/user/signup.html'));
+
+};
 
 exports.create = (req, res, next) => {
 
-  const input = emptyToNull(req.body);
+  let input = emptyToNull(req.body);
+  bcrypt.hash(input.password, saltRounds, function(err, hash) {
 
-  User.create({
-    name: input.name,
-    lastName: input.lastName,
-    email: input.email,
-    password: input.password
-  }).then(result => {
-    logger.info(`User ${input.name} created successfully.`);
-    res.status(201).send(result);
-
-  }).catch(error => {
-
-    let errorBag = [];
-    if(error.errors){
-      errorBag = error.errors.map(err => err.message);
-      logger.error(`A database error occured when attempting a user signup. Details: ${errorBag}.`);
-      res.status(401).send(errorBag);
-    }else{
-      logger.error(`Unhandled error! details: ${error}`);
-      res.status(500).send(error);
+    User.create({
+      name: input.name,
+      lastName: input.lastName,
+      email: input.email,
+      password: input.password
+    },
+    {
+      hash: hash
     }
+    ).then(result => {
+      let message = `User ${input.name} created successfully.`;
+      logger.info(message);
+      res.status(201).send(result);
+  
+    }).catch(error => {
+  
+      let errorBag = [];
+      if(error.errors){
+        for(i = 0; i< error.errors.length; i++){
+          errorBag.push(error.errors[i].message);
+        }
+        logger.error(`A database error occured when attempting a user signup. Details: ${errorBag}.`);
+        res.status(200).send(errorBag);
+      }else{
+        logger.error(`Unhandled error! details: ${error}`);
+        res.status(500).send(error);
+      }
+  
+    });
 
   });
   
@@ -35,15 +60,7 @@ exports.signin = (req, res, next) => {
   try {
     validationResult(req).throw();
   } catch (err) {
-    let errors = {};
-    if(err.mapped().email){
-      errors.email = err.mapped().email.msg + ';';
-    }
-    if(err.mapped().password){
-      errors.password = err.mapped().password.msg;
-    }
-    return res.status(400).send(errors);
-     
+    return next(errors.invalidCredentialError);
   }
 
   let input = emptyToNull(req.body);
@@ -59,28 +76,38 @@ exports.signin = (req, res, next) => {
   }
 
   User.findOne({
-    where: {
-      email: input.email
-    }
+    where: { email: input.email }
   }).then(result => {
-    
-    if(!result){
-      logger.info(`Login attempt with invalid email: "${input.email}"`);
-      return res.status(401).send('Database error');
-    }
 
-    if(!result.validPassword(input.password)){
-      logger.info(`Failed login attempt to account with email "${input.email}", invalid password`);
-      return res.status(401).send('Invalid password');
+    if(!result){
+      logger.info(`Failed login attempt to account with invalid email: "${input.email}"`);
+      return next(errors.invalidCredentialError);
     }
     
-    let token = jwt.encode({token: result.email}, secret);
-    logger.info(`User ${result.email} successfully logged in`);
-    res.status(200).json(token);
+    bcrypt.compare(input.password, result.password).catch(err => {}).then(correctPassword => {
+
+      if(!correctPassword){
+        logger.info(`Failed login attempt to account with email: "${input.email}", invalid password`);
+        return next(errors.invalidCredentialError);
+      }
+
+      let token = jwt.encode({token: result.email}, secret);
+      logger.info(`User ${result.email} successfully logged in`);
+      return res.status(200).json({
+        user:{
+          name: result.name,
+          lastName: result.lastName,
+          email: result.email
+        },
+        token: token
+      });
+    });
+
 
   }).catch(error => {
     logger.error(`Unhandled error! details: ${error}`);
-    return next(error);
+    console.log(error);
+    return next(errors.defaultError);
   });
 
 };
@@ -98,5 +125,3 @@ const emptyToNull = (input) => {
   return newInput;
 
 };
-
-exports.validateLoginInput = [check('email').isEmail().withMessage('Email is invalid'), check('password', 'passwords must be at least 8 chars long').isLength({ min: 8 })];

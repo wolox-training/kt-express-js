@@ -1,6 +1,6 @@
 'use strict';
 
-const bcrypt = require('bcrypt-nodejs');
+const bcrypt = require('bcrypt');
 
 module.exports = (sequelize, DataTypes) => {
   var user = sequelize.define('users', {
@@ -48,12 +48,16 @@ module.exports = (sequelize, DataTypes) => {
     },
     instanceMethods: {
       validPassword(password) {
-        return bcrypt.compareSync(password, this.password);
+        bcrypt.compare(password, this.password,  (err, res) => {
+          if (err) {
+            reject(err);
+          }
+        });
       }
     },
     hooks: {
       afterValidate: (user, options) => {
-        user.password = bcrypt.hashSync(user.password, bcrypt.genSaltSync(8), null);
+        user.password = options.hash;
       }
     }
   });
