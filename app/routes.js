@@ -1,4 +1,5 @@
-const user = require('./controllers/user');
+const user = require('./controllers/user')
+  auth = require('./middlewares/auth');
 
 exports.init = (app) => {
   
@@ -6,6 +7,6 @@ exports.init = (app) => {
 
   app.post('/users/sessions', [], user.signin);
 
-  app.get('/users/list/:offset?/:limit?', [], user.list);
+  app.get('/users/list/:offset?/:limit?', auth.checkCredentials, user.list);
 
 };
