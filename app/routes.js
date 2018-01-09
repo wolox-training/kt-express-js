@@ -1,4 +1,4 @@
-const user = require('./controllers/user')
+const user = require('./controllers/user'),
   auth = require('./middlewares/auth');
 
 exports.init = (app) => {
