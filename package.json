@@ -19,9 +19,9 @@
     "outdated": "npm outdated --depth 0",
     "pretest": "npm run lint",
     "prestart": "npm run lint",
-    "migrations": "./node_modules/.bin/sequelize --config ./migrations/config.js --migrations-path ./migrations/migrations db:migrate",
+    "migrations": "./node_modules/.bin/sequelize --config ./config/db.js --migrations-path ./migrations/migrations db:migrate",
     "start": "./node_modules/.bin/nodemon --inspect app.js",
-    "test": "NODE_ENV=testing ./node_modules/mocha/bin/mocha --compilers js:babel-core/register test/app.js && npm run nsp",
+    "test": "npm run migrations && NODE_ENV=testing ./node_modules/mocha/bin/mocha --compilers js:babel-core/register test/app.js && npm run nsp",
     "test-inspect": "NODE_ENV=testing node --inspect --debug-brk ./node_modules/mocha/bin/_mocha --compilers js:babel-core/register test/app.js"
   },
   "cacheDirectories": [
@@ -39,15 +39,17 @@
     "url": "https://github.com/Wolox/WoloxLand/issues"
   },
   "dependencies": {
-    "bcrypt-nodejs": "0.0.3",
+    "bcrypt": "^1.0.3",
     "body-parser": "^1.14.2",
     "client-sessions": "^0.8.0",
     "dotenv": "^4.0.0",
     "express": "^4.9.4",
+    "express-validator": "^4.3.0",
     "jwt-simple": "^0.5.1",
+    "minimatch": "^3.0.4",
     "morgan": "^1.7.0",
     "pg": "^4.4.6",
-    "rollbar": "^2.3.1",
+    "rollbar": "^2.3.6",
     "sequelize": "^3.30.0",
     "umzug": "^2.0.1",
     "winston": "^2.4.0",
@@ -62,7 +64,7 @@
     "chai-http": "^2.0.1",
     "coveralls": "^2.11.9",
     "dictum.js": "^1.0.0",
-    "eslint": "^4.8.0",
+    "eslint": "^4.15.0",
     "eslint-config-airbnb-base": "^12.0.2",
     "eslint-config-prettier": "^2.3.1",
     "eslint-plugin-import": "^2.6.1",
@@ -71,10 +73,10 @@
     "istanbul": "^0.4.3",
     "mocha": "^2.4.5",
     "mocha-lcov-reporter": "^1.2.0",
-    "nodemon": "^1.11.0",
+    "nodemon": "^1.14.10",
     "nsp": "^2.6.2",
     "prettier": "^1.8.2",
-    "prettier-eslint": "^8.2.1",
+    "prettier-eslint": "^8.7.1",
     "prompt": "^1.0.0",
     "sequelize-cli": "^2.1.0"
   }

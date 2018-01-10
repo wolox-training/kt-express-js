@@ -1,6 +1,8 @@
 const errors = require('../errors'),
   logger = require('../logger'),
-  jwt = require('jwt-simple');
+  jwt = require('jwt-simple'),
+  secret = process.env.NODE_API_JWT_SECRET_STRING,
+  User = require('../models').users;
 
 exports.checkCredentials = (req, res, next) => {
 

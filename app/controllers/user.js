@@ -1,7 +1,10 @@
 const User = require('../models').users,
   errors = require('../errors'),
   logger = require('../logger'),
-  session = require('client-sessions');
+  jwt = require('jwt-simple'),
+  secret = process.env.NODE_API_JWT_SECRET_STRING,
+  { check, validationResult } = require('express-validator/check'),
+  bcrypt = require('bcrypt');
 
 
 exports.signup = (req, res, next) => {
@@ -21,65 +24,87 @@ exports.create = (req, res, next) => {
     lastName: input.lastName,
     email: input.email,
     password: input.password
-  }).then(result => {
-    let message = `User ${input.name} created successfully.`;
-    logger.info(message);
-    res.status(201).send(result);
+  })
+    .then(result => {
+      let message = `User ${input.name} created successfully.`;
+      logger.info(message);
+      res.status(201).send({
+        name: result.name,
+        lastName: result.lastName,
+        email: result.email
+      });
 
-  }).catch(error => {
+    }).catch(error => {
 
-    let errorBag = [];
-    if(error.errors){
-      for(i = 0; i< error.errors.length; i++){
-        errorBag.push(error.errors[i].message);
+      let errorBag = [];
+      if(error.errors){
+        errorBag = error.errors.map(err => err.message);
+        logger.error(`A database error occured when attempting a user signup. Details: ${errorBag}.`);
+        res.status(401).send(errorBag);
+      }else{
+        logger.error(`Unhandled error! details: ${error}`);
+        res.status(500).send(error);
       }
-      logger.error(`A database error occured when attempting a user signup. Details: ${errorBag}.`);
-      res.status(200).send(errorBag);
-    }else{
-      logger.error(`Unhandled error! details: ${error}`);
-      res.status(500).send(error);
-    }
 
-  });
+    });
+
+  
   
 };
 
 exports.signin = (req, res, next) => {
 
+  try {
+    validationResult(req).throw();
+  } catch (err) {
+    return next(errors.invalidCredentialError);
+  }
+
   let input = emptyToNull(req.body);
 
-  if(!input.email || !input.password){
-    return res.status(400).send('Both email and password are required to continue');
-  }
-  if (req.session && req.session.user && req.session.user.email === input.email){
-    return res.status(200).send('You are already logged in!');
+  if (req.headers.token){
+
+    let token = jwt.decode(req.headers.token, secret);
+
+    if(token.token == input.email){
+      return res.status(200).send('You are already logged in!');
+    }
     
   }
 
   User.findOne({
-    where: {
-      email: input.email
-    }
+    where: { email: input.email }
   }).then(result => {
-    
-    if(!result || !result.email){
-      logger.info(`Login attempt with invalid email: "${input.email}"`);
-      return res.status(404).send('The provided email does not exist in our database!');
-    }
 
-    if(!result.validPassword(input.password)){
-      logger.info(`Failed login attempt to account with email "${input.email}", invalid password`);
-      return res.status(401).send('Invalid password');
+    if(!result){
+      logger.info(`Failed login attempt to account with invalid email: "${input.email}"`);
+      return next(errors.invalidCredentialError);
     }
     
-    req.session.user = result;
-    logger.info(`User ${result.email} successfully logged in`);
-    res.status(200).send(`User ${result.name} logged in correctly!`);
+    bcrypt.compare(input.password, result.password).catch(err => {}).then(correctPassword => {
+
+      if(!correctPassword){
+        logger.info(`Failed login attempt to account with email: "${input.email}", invalid password`);
+        return next(errors.invalidCredentialError);
+      }
+
+      let token = jwt.encode({token: result.email}, secret);
+      logger.info(`User ${result.email} successfully logged in`);
+      return res.status(200).send({
+        user:{
+          name: result.name,
+          lastName: result.lastName,
+          email: result.email
+        },
+        token: token
+      });
+    });
+
 
   }).catch(error => {
-    console.log(error);
     logger.error(`Unhandled error! details: ${error}`);
-    return next();
+    console.log(error);
+    return next(errors.defaultError);
   });
 
 };
@@ -88,17 +113,13 @@ exports.list = (req, res, next) => {
 
   let params = emptyToNull(req.params);
 
-  if(!result){
-    return res.status(401).send('Invalid credentials');
-  }
-
   User.findAll({
     attributes: ['name', 'lastName', 'email'],
     offset: params.offset,
     limit: params.limit ? params.limit : 10
   })
     .then(result => {
-      logger.info('User list requested.');
+      logger.info('User list requested');
       return res.status(200).send(result);
 
     }).catch(err => {
@@ -110,12 +131,14 @@ exports.list = (req, res, next) => {
 
 const emptyToNull = (input) => {
 
-  for (let key in input){
+  let newInput = {};
 
-    input[key] = input[key] === '' ? null : input[key];
+  Object.keys(input).forEach((key) => {
+
+    newInput[key] = input[key] === '' ? null : input[key];
   
-  }
+  });
 
-  return input;
+  return newInput;
 
 };
