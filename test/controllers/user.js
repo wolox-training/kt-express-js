@@ -2,6 +2,7 @@ let chai = require('chai'),
   chaiHttp = require('chai-http'),
   server = require('../../app'),
   should = chai.should(),
+  expect = chai.expect,
   dictum = require('dictum.js'),
   User = require('../../app/models').users;
 
@@ -130,8 +131,9 @@ describe('/POST users/sessions', () => {
         chai.request(server)
           .post('/users/sessions')
           .send(correctLogin)
-          .end((err, res) => {
+          .then((res) => {
             res.should.have.status(200);
+            expect(res.body).to.have.property('token');
             dictum.chai(res, 'User signin');
             done();
           });

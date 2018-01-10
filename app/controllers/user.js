@@ -4,8 +4,7 @@ const User = require('../models').users,
   jwt = require('jwt-simple'),
   secret = process.env.NODE_API_JWT_SECRET_STRING,
   { check, validationResult } = require('express-validator/check'),
-  bcrypt = require('bcrypt'),
-  saltRounds = 8;
+  bcrypt = require('bcrypt');
 
 
 exports.signup = (req, res, next) => {
@@ -19,39 +18,37 @@ exports.signup = (req, res, next) => {
 exports.create = (req, res, next) => {
 
   let input = emptyToNull(req.body);
-  bcrypt.hash(input.password, saltRounds, function(err, hash) {
 
-    User.create({
-      name: input.name,
-      lastName: input.lastName,
-      email: input.email,
-      password: input.password
-    },
-    {
-      hash: hash
-    }
-    ).then(result => {
+  User.create({
+    name: input.name,
+    lastName: input.lastName,
+    email: input.email,
+    password: input.password
+  })
+    .then(result => {
       let message = `User ${input.name} created successfully.`;
       logger.info(message);
-      res.status(201).send(result);
-  
+      res.status(201).send({
+        name: result.name,
+        lastName: result.lastName,
+        email: result.email
+      });
+
     }).catch(error => {
-  
+
       let errorBag = [];
       if(error.errors){
-        for(i = 0; i< error.errors.length; i++){
-          errorBag.push(error.errors[i].message);
-        }
+        errorBag = error.errors.map(err => err.message);
         logger.error(`A database error occured when attempting a user signup. Details: ${errorBag}.`);
-        res.status(200).send(errorBag);
+        res.status(401).send(errorBag);
       }else{
         logger.error(`Unhandled error! details: ${error}`);
         res.status(500).send(error);
       }
-  
+
     });
 
-  });
+  
   
 };
 
@@ -93,7 +90,7 @@ exports.signin = (req, res, next) => {
 
       let token = jwt.encode({token: result.email}, secret);
       logger.info(`User ${result.email} successfully logged in`);
-      return res.status(200).json({
+      return res.status(200).send({
         user:{
           name: result.name,
           lastName: result.lastName,

@@ -46,18 +46,9 @@ module.exports = (sequelize, DataTypes) => {
         // associations can be defined here
       },
     },
-    instanceMethods: {
-      validPassword(password) {
-        bcrypt.compare(password, this.password,  (err, res) => {
-          if (err) {
-            reject(err);
-          }
-        });
-      }
-    },
     hooks: {
       afterValidate: (user, options) => {
-        user.password = options.hash;
+        user.password = bcrypt.hashSync(user.password, bcrypt.genSaltSync(8), null);
       }
     }
   });
