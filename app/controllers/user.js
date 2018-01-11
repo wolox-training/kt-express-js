@@ -54,7 +54,7 @@ exports.signin = (req, res, next) => {
 
     let token = jwt.decode(req.headers.token, config.common.session.secret);
 
-    if(token.token == input.email){
+    if(token.email == input.email){
       return res.status(200).send('You are already logged in!');
     }
     
@@ -76,7 +76,7 @@ exports.signin = (req, res, next) => {
         return next(errors.invalidCredentialError);
       }
 
-      const token = jwt.encode({token: result.email}, config.common.session.secret);
+      const token = jwt.encode({email: result.email}, config.common.session.secret);
       logger.info(`User ${result.email} successfully logged in`);
       return res.status(200).send({
         user:{
@@ -107,7 +107,7 @@ exports.list = (req, res, next) => {
   })
     .then(result => {
       logger.info('User list requested');
-      return res.status(200).send(result);
+      return res.status(200).send({users: result});
 
     }).catch(err => {
       logger.error(`Unexpected error occurred! Details: ${err}`);

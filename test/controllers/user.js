@@ -20,8 +20,6 @@ const correctLogin = {
   password: '12345678'
 };
 
-let token = '';
-
 /*
 * Testing the /users (POST) route
 */
@@ -129,7 +127,6 @@ describe('/POST users/sessions', () => {
           .then((res) => {
             res.should.have.status(200);
             expect(res.body).to.have.property('token');
-            token = res.body.token;
             dictum.chai(res, 'User signin');
 
             done();
@@ -217,42 +214,33 @@ describe('/POST users/list', () => {
     password: '12345678'
   };
 
+  beforeEach(() => {
+
+    User.create(newUser).then(res => {User.create(userOne).then(res => {User.create(userTwo);});});
+
+  });
+
   it('should return all users from the database', (done) => {
 
     chai.request(server)
-      .post('/users')
-      .send(newUser)
-      .then((res) => {
+      .post('/users/sessions')
+      .send(correctLogin)
+      .then(res => {
 
         chai.request(server)
-          .post('/users')
-          .send(userOne)
+          .get('/users/list')
+          .set('token', res.body.token)
           .then((res) => {
-
-            chai.request(server)
-              .post('/users')
-              .send(userTwo)
-              .then((res) => {
-
-                chai.request(server)
-                  .get('/users/list')
-                  .set('token', token)
-                  .then((res) => {
-                    res.should.have.status(200);
-                    res.body.should.include(
-                      {name: 'Kevin', lastName: 'Temes', email: 'kevin.temes@wolox.com.ar'},
-                      {name: 'userOne', lastName: 'userOne', email: 'userOne@wolox.com'}, 
-                      {name: 'userTwo', lastName: 'userTwo', email: 'userTwo@wolox.com'}
-                    );
-                    dictum.chai(res, 'User list retrieval');
-                    done();
-                  });
-                
-                
-              });
-            
+            res.should.have.status(200);
+            res.body.users.should.include(
+              {name: 'Kevin', lastName: 'Temes', email: 'kevin.temes@wolox.com.ar'},
+              {name: 'userOne', lastName: 'userOne', email: 'userOne@wolox.com'}, 
+              {name: 'userTwo', lastName: 'userTwo', email: 'userTwo@wolox.com'}
+            );
+            dictum.chai(res, 'User list retrieval');
+            done();
           });
-        
+
       });
 
   });
@@ -260,67 +248,35 @@ describe('/POST users/list', () => {
   it('should return only the second user', (done) => {
 
     chai.request(server)
-      .post('/users')
-      .send(newUser)
-      .then((res) => {
-
+      .post('/users/sessions')
+      .send(correctLogin)
+      .then(res => {
         chai.request(server)
-          .post('/users')
-          .send(userOne)
+          .get('/users/list/1/1')
+          .set('token', res.body.token)
           .then((res) => {
-
-            chai.request(server)
-              .post('/users')
-              .send(userTwo)
-              .then((res) => {
-
-                chai.request(server)
-                  .get('/users/list/1/1')
-                  .set('token', token)
-                  .then((res) => {
-                    res.should.have.status(200);
-                    res.body.should.include({name: 'userOne', lastName: 'userOne', email: 'userOne@wolox.com'});
-                    done();
-                  });
-                
-              });
-            
+            res.should.have.status(200);
+            res.body.users.should.include( { name: 'userOne', lastName: 'userOne', email: 'userOne@wolox.com' } );
+            done();
           });
-        
       });
-
+                
   });
 
   it('should return only the last user', (done) => {
 
     chai.request(server)
-      .post('/users')
-      .send(newUser)
-      .then((res) => {
-
+      .post('/users/sessions')
+      .send(correctLogin)
+      .then(res => {
         chai.request(server)
-          .post('/users')
-          .send(userOne)
-          .then((res) => {
-
-            chai.request(server)
-              .post('/users')
-              .send(userTwo)
-              .then((res) => {
-
-                chai.request(server)
-                  .get('/users/list/2/1')
-                  .set('token', token)
-                  .end((err, res) => {
-                    res.should.have.status(200);
-                    res.body.should.include({name: 'userTwo', lastName: 'userTwo', email: 'userTwo@wolox.com'});
-                    done();
-                  });
-                
-              });
-            
+          .get('/users/list/2/1')
+          .set('token', res.body.token)
+          .end((err, res) => {
+            res.should.have.status(200);
+            res.body.users.should.include({name: 'userTwo', lastName: 'userTwo', email: 'userTwo@wolox.com'});
+            done();
           });
-        
       });
 
   });

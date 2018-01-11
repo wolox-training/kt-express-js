@@ -1,7 +1,7 @@
 const errors = require('../errors'),
   logger = require('../logger'),
   jwt = require('jwt-simple'),
-  secret = process.env.NODE_API_JWT_SECRET_STRING,
+  config = require('../../config'),
   User = require('../models').users;
 
 exports.checkCredentials = (req, res, next) => {
@@ -10,16 +10,14 @@ exports.checkCredentials = (req, res, next) => {
     return res.status(401).send('You must be logged in to access this endpoint');
   }
 
-  let token = jwt.decode(req.headers.token, secret);
+  let token = jwt.decode(req.headers.token, config.common.session.secret);
 
   User.findOne({
-    where: {
-      email: token.token
-    }
-  }).then(result => {
+    where: token
+  }).then(user => {
 
-    if(!result){
-      return res.status(401).send('Invalid credentials');
+    if(!user){
+      return next(errors.invalidCredentialError);
     }
 
     next();
