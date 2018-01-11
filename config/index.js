@@ -4,8 +4,6 @@ const ENVIRONMENT = process.env.NODE_ENV || 'development';
 
 const configFile = `./${ENVIRONMENT}`;
 
-const secret = process.env.NODE_API_JWT_SECRET_STRING;
-
 const isObject = variable => {
   return variable instanceof Object;
 };
