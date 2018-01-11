@@ -129,3 +129,40 @@ const emptyToNull = (input) => {
   return newInput;
 
 };
+
+const newUser = (req, res, next, input) => {
+
+  User.create({
+    name: input.name,
+    lastName: input.lastName,
+    email: input.email,
+    password: input.password,
+    isAdmin: input.isAdmin
+  })
+    .then(result => {
+      if(input.isAdmin){
+        logger.info(`Admin user ${input.email} created successfully.`);
+      }else{
+        logger.info(`User ${input.email} created successfully.`);
+      }
+      return res.status(201).send({
+        name: result.name,
+        lastName: result.lastName,
+        email: result.email
+      });
+
+    }).catch(error => {
+
+      let errorBag = [];
+      if(error.errors){
+        errorBag = error.errors.map(err => err.message);
+        logger.error(`A database error occured when attempting a user signup. Details: ${errorBag}.`);
+        return res.status(401).send(errorBag);
+      }else{
+        logger.error(`Unhandled error! details: ${error}`);
+        return res.status(500).send(error);
+      }
+
+    });
+
+};

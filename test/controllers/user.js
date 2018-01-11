@@ -3,6 +3,7 @@ const chai = require('chai'),
   server = require('../../app'),
   should = chai.should(),
   expect = chai.expect,
+  assert = chai.assert,
   dictum = require('dictum.js'),
   User = require('../../app/models').users;
 
@@ -278,8 +279,7 @@ describe('/POST users/list', () => {
             done();
           });
       });
-
-  });
+    });
 
   it('should deny access to the endpoint if the user is not logged in', (done) => {
 
