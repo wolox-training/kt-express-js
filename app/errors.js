@@ -4,9 +4,12 @@ exports.notFound = {
   message: 'Not found'
 };
 
-exports.defaultError = (message) => {
-  return {
-    statusCode: 500,
-    message
-  };
+exports.defaultError = {
+  statusCode: 500,
+  message: 'Internal Server Error. Please try again later.'
+};
+
+exports.invalidCredentialError = {
+  statusCode: 401,
+  message : 'Invalid Email/Password combination'
 };
