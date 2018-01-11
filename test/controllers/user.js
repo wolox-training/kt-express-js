@@ -1,4 +1,4 @@
-let chai = require('chai'),
+const chai = require('chai'),
   chaiHttp = require('chai-http'),
   server = require('../../app'),
   should = chai.should(),
@@ -8,17 +8,17 @@ let chai = require('chai'),
 
 chai.use(chaiHttp);
 
+const newUser = {
+  name: 'Kevin',
+  lastName: 'Temes',
+  email: 'kevin.temes@wolox.com.ar',
+  password: '12345678'
+};
+
 /*
 * Testing the /users (POST) route
 */
 describe('/POST users', () => {
-
-  const newUser = {
-    name: 'Kevin',
-    lastName: 'Temes',
-    email: 'kevin.temes@wolox.com.ar',
-    password: '12345678'
-  };
 
   it('Should successfully POST a user with the given inputs', (done) => {
     chai.request(server)
@@ -52,7 +52,7 @@ describe('/POST users', () => {
 
   it('Should throw an error when attempting to POST a user with an non-woloxer email', (done) => {
 
-    let userWithWrongEmail = {
+    const userWithWrongEmail = {
       name: 'Kevin',
       lastName: 'Temes',
       email: 'im.not.from.wolox@email.com',
@@ -70,7 +70,7 @@ describe('/POST users', () => {
 
   it('Should throw an error when attempting to POST a user with an invalid password', (done) => {
 
-    let userWithWrongPassword = {
+    const userWithWrongPassword = {
       name: 'Kevin',
       lastName: 'Temes',
       email: 'totally.real.email@wolox.com',
@@ -87,7 +87,7 @@ describe('/POST users', () => {
 
   it('Should throw an error when attempting to POST a user with null or empty fields', (done) => {
 
-    let emptyUser = {
+    const emptyUser = {
       name: '',
       lastName: null,
       email: null,
@@ -108,13 +108,6 @@ describe('/POST users', () => {
 * Testing the /users/sessions (POST) route
 */
 describe('/POST users/sessions', () => {
-
-  const newUser = {
-    name: 'Kevin',
-    lastName: 'Temes',
-    email: 'kevin.temes@wolox.com.ar',
-    password: '12345678'
-  };
 
   it('should successfully log a user', (done) => {
 
