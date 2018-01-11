@@ -2,22 +2,13 @@ const User = require('../models').users,
   errors = require('../errors'),
   logger = require('../logger'),
   jwt = require('jwt-simple'),
-  secret = process.env.NODE_API_JWT_SECRET_STRING,
-  { check, validationResult } = require('express-validator/check'),
+  config = require('../../config/index'),
+  { validationResult } = require('express-validator/check'),
   bcrypt = require('bcrypt');
-
-
-exports.signup = (req, res, next) => {
-
-  res.status(200);
-  
-  res.sendFile(path.resolve('app/views/user/signup.html'));
-
-};
 
 exports.create = (req, res, next) => {
 
-  let input = emptyToNull(req.body);
+  const input = emptyToNull(req.body);
 
   User.create({
     name: input.name,
@@ -26,8 +17,7 @@ exports.create = (req, res, next) => {
     password: input.password
   })
     .then(result => {
-      let message = `User ${input.name} created successfully.`;
-      logger.info(message);
+      logger.info(`User ${input.name} created successfully.`);
       res.status(201).send({
         name: result.name,
         lastName: result.lastName,
@@ -48,8 +38,6 @@ exports.create = (req, res, next) => {
 
     });
 
-  
-  
 };
 
 exports.signin = (req, res, next) => {
@@ -60,11 +48,11 @@ exports.signin = (req, res, next) => {
     return next(errors.invalidCredentialError);
   }
 
-  let input = emptyToNull(req.body);
+  const input = emptyToNull(req.body);
 
   if (req.headers.token){
 
-    let token = jwt.decode(req.headers.token, secret);
+    let token = jwt.decode(req.headers.token, config.common.session.secret);
 
     if(token.token == input.email){
       return res.status(200).send('You are already logged in!');
@@ -81,14 +69,14 @@ exports.signin = (req, res, next) => {
       return next(errors.invalidCredentialError);
     }
     
-    bcrypt.compare(input.password, result.password).catch(err => {}).then(correctPassword => {
+    bcrypt.compare(input.password, result.password).then(correctPassword => {
 
       if(!correctPassword){
         logger.info(`Failed login attempt to account with email: "${input.email}", invalid password`);
         return next(errors.invalidCredentialError);
       }
 
-      let token = jwt.encode({token: result.email}, secret);
+      const token = jwt.encode({token: result.email}, config.common.session.secret);
       logger.info(`User ${result.email} successfully logged in`);
       return res.status(200).send({
         user:{
@@ -103,7 +91,6 @@ exports.signin = (req, res, next) => {
 
   }).catch(error => {
     logger.error(`Unhandled error! details: ${error}`);
-    console.log(error);
     return next(errors.defaultError);
   });
 

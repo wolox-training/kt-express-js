@@ -1,4 +1,4 @@
-let chai = require('chai'),
+const chai = require('chai'),
   chaiHttp = require('chai-http'),
   server = require('../../app'),
   should = chai.should(),
@@ -59,7 +59,7 @@ describe('/POST users', () => {
 
   it('Should throw an error when attempting to POST a user with an non-woloxer email', (done) => {
 
-    let userWithWrongEmail = {
+    const userWithWrongEmail = {
       name: 'Kevin',
       lastName: 'Temes',
       email: 'im.not.from.wolox@email.com',
@@ -77,7 +77,7 @@ describe('/POST users', () => {
 
   it('Should throw an error when attempting to POST a user with an invalid password', (done) => {
 
-    let userWithWrongPassword = {
+    const userWithWrongPassword = {
       name: 'Kevin',
       lastName: 'Temes',
       email: 'totally.real.email@wolox.com',
@@ -94,7 +94,7 @@ describe('/POST users', () => {
 
   it('Should throw an error when attempting to POST a user with null or empty fields', (done) => {
 
-    let emptyUser = {
+    const emptyUser = {
       name: '',
       lastName: null,
       email: null,
@@ -240,6 +240,7 @@ describe('/POST users/list', () => {
                   .then((res) => {
                     res.should.have.status(200);
                     res.body.should.include(
+                      {name: 'Kevin', lastName: 'Temes', email: 'kevin.temes@wolox.com.ar'},
                       {name: 'userOne', lastName: 'userOne', email: 'userOne@wolox.com'}, 
                       {name: 'userTwo', lastName: 'userTwo', email: 'userTwo@wolox.com'}
                     );
@@ -321,6 +322,16 @@ describe('/POST users/list', () => {
           });
         
       });
+
+  });
+
+  it('should deny access to the endpoint if the user is not logged in', (done) => {
+
+    chai.request(server)
+      .get('/users/list/2/1')
+      .catch(err => {
+        err.should.have.status(401);
+      }).then(() => done());
 
   });
 
