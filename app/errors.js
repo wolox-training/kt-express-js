@@ -15,6 +15,6 @@ exports.invalidCredentialError = {
 };
 
 exports.notAnAdmin = {
-  statusCode: 401,
-  message: 'You must be and Administrator to access this endpoint.'
+  statusCode: 403,
+  message: 'You must be an Administrator to access this endpoint.'
 };

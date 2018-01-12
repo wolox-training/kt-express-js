@@ -140,11 +140,9 @@ const newUser = (req, res, next, input) => {
     isAdmin: input.isAdmin
   })
     .then(result => {
-      if(input.isAdmin){
-        logger.info(`Admin user ${input.email} created successfully.`);
-      }else{
-        logger.info(`User ${input.email} created successfully.`);
-      }
+
+      logger.info(`User ${input.email} created successfully.`);
+      
       return res.status(201).send({
         name: result.name,
         lastName: result.lastName,
@@ -164,5 +162,32 @@ const newUser = (req, res, next, input) => {
       }
 
     });
+
+};
+
+exports.createAdmin = (req, res, next) => {
+
+  let input = emptyToNull(req.body);
+
+  User.findOne({ where: {email: input.email} }).then(loggedUser => {
+
+    input.isAdmin = true;
+
+    if(!loggedUser) {
+      newUser(req, res, next, input);
+    }else{
+      loggedUser.update(input).then(updated => {
+        return res.status(201).send({
+          name: updated.name,
+          lastName: updated.lastName,
+          email: updated.email
+        });
+      });
+    }
+
+  }).catch(err => {
+    logger.error(`Unhandled error! details: ${err}`);
+    return next(errors.defaultError);
+  });
 
 };
