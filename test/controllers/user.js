@@ -252,7 +252,7 @@ describe('/POST users/list', () => {
       .send(correctLogin)
       .then(res => {
         chai.request(server)
-          .get('/users/list/1/1')
+          .get('/users/list?offset=1&limit=1')
           .set('token', res.body.token)
           .then((res) => {
             res.should.have.status(200);
@@ -270,9 +270,9 @@ describe('/POST users/list', () => {
       .send(correctLogin)
       .then(res => {
         chai.request(server)
-          .get('/users/list/2/1')
+          .get('/users/list?offset=2&limit=1')
           .set('token', res.body.token)
-          .end((err, res) => {
+          .then(res => {
             res.should.have.status(200);
             res.body.users.should.include({name: 'userTwo', lastName: 'userTwo', email: 'userTwo@wolox.com'});
             done();
@@ -284,7 +284,7 @@ describe('/POST users/list', () => {
   it('should deny access to the endpoint if the user is not logged in', (done) => {
 
     chai.request(server)
-      .get('/users/list/2/1')
+      .get('/users/list?offset=2&limit=1')
       .catch(err => {
         err.should.have.status(401);
       }).then(() => done());
