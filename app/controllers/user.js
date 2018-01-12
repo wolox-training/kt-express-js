@@ -2,7 +2,7 @@ const User = require('../models').users,
   errors = require('../errors'),
   logger = require('../logger'),
   jwt = require('jwt-simple'),
-  config = require('../../config/index'),
+  config = require('../../config'),
   { validationResult } = require('express-validator/check'),
   bcrypt = require('bcrypt');
 

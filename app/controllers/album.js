@@ -1,13 +1,13 @@
 const User = require('../models').users,
   logger = require('../logger'),
   https = require('https'),
-  url_albums_list = 'https://jsonplaceholder.typicode.com/albums';
+  config = require('../../config');
 
 exports.list = (req, res, next) => {
 
-  logger.info(`Attempting GET request to url ${url_albums_list} by user [PLACEHOLDER]`);
+  logger.info(`Attempting GET request to url ${config.common.urlRequests.albumList}`);
 
-  https.get(url_albums_list, (resp) => {
+  https.get(config.common.urlRequests.albumList, (resp) => {
     let data = '';
     
     resp.on('data', (chunk) => {
@@ -15,12 +15,12 @@ exports.list = (req, res, next) => {
     });
     
     resp.on('end', () => {
-      logger.info(`Response received from ${url_albums_list}`);
-      return res.status(200).send(data);
+      logger.info(`Response received from ${config.common.urlRequests.albumList}`);
+      return res.status(200).send(JSON.parse(data));
     });
  
   }).on('error', (err) => {
-    logger.error(`An error occured while attempting a GET request to url ${url_albums_list}: ${err.message}`);
+    logger.error(`An error occured while attempting a GET request to url ${config.common.urlRequests.albumList}: ${err.message}`);
   });
 
 };
