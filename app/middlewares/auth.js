@@ -7,10 +7,10 @@ const errors = require('../errors'),
 exports.checkCredentials = (req, res, next) => {
 
   if (!req.headers.token){
-    return res.status(401).send('You must be logged in to access this endpoint');
+    return res.status(401).send('You must be logged in to access this endpoint.');
   }
 
-  let token = jwt.decode(req.headers.token, config.common.session.secret);
+  const token = jwt.decode(req.headers.token, config.common.session.secret);
 
   User.findOne({
     where: token
@@ -19,7 +19,8 @@ exports.checkCredentials = (req, res, next) => {
     if(!user){
       return next(errors.invalidCredentialError);
     }
-    req.isAdmin = user.isAdmin;
+
+    req.user = user;
     next();
   
   });
@@ -28,7 +29,7 @@ exports.checkCredentials = (req, res, next) => {
 
 exports.isAdmin = (req, res, next, user) => {
 
-  if(!req.isAdmin){
+  if(!req.user.isAdmin){
     return next(errors.notAnAdmin);
   }
   next();

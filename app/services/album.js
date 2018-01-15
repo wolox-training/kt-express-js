@@ -2,20 +2,24 @@ const request = require('request-promise'),
   logger = require('../logger'),
   config = require('../../config');
 
-exports.listRequest = (req, res, next) => {
+exports.listRequest = () => {
 
-  logger.info(`Attempting GET request to url ${config.common.urlRequests.albumList}`);
+  return new Promise((resolve, reject) => {
 
-  request(config.common.urlRequests.albumList).then(response => {
+  request(config.common.urlRequests.albumList).then(response => resolve(response));
+  
+  });
 
-    logger.info(`Response received from ${config.common.urlRequests.albumList}`);
-    return res.status(200).send(JSON.parse(response));
+};
 
-  }).catch(error => {
+exports.checkAlbum = (id) => {
 
-    logger.error(`An error occured while attempting a GET request to url ${config.common.urlRequests.albumList}: ${error.message}`);
-    return res.status(502).send(error.message);
-
+  return new Promise((resolve, reject) => {
+    rp(config.common.urlRequests.albumList + '/' + id)
+      .then(album => resolve(album))
+      .catch(error => {
+        reject(error);
+      });
   });
 
 };
