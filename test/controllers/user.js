@@ -333,22 +333,30 @@ describe('/POST admin/users', () => {
   it('should successfully create an admin user', (done) => {
 
     User.create(admin).then(res => {
-      chai.request(server)
-        .post('/users/sessions')
-        .send(adminLogin)
-        .then((res) => {
-          chai.request(server)
-            .post('/admin/users')
-            .send(newAdmin)
-            .set('token', res.body.token)
-            .then(result => {
-              result.should.have.status(201);
-              result.body.should.include({name: 'Admin', lastName: 'Admin', email: 'admin@wolox.com'});
-              done();
-            }).catch(err => {
-              console.log(err);
-            });
-        });
+
+      User.count().then(oldUsers => {
+
+        chai.request(server)
+          .post('/users/sessions')
+          .send(adminLogin)
+          .then((res) => {
+            chai.request(server)
+              .post('/admin/users')
+              .send(newAdmin)
+              .set('token', res.body.token)
+              .then(result => {
+                result.should.have.status(201);
+                User.count().then(newUsers => {
+                  newUsers.should.equal(oldUsers + 1);
+                  done();
+                });
+              }).catch(err => {
+                console.log(err);
+              });
+          });        
+
+      });
+
     });
 
   });
@@ -357,22 +365,24 @@ describe('/POST admin/users', () => {
 
     User.create(admin).then(res => {
       User.create(notAnAdmin).then(res => {
-        chai.request(server)
-          .post('/users/sessions')
-          .send(adminLogin)
-          .then((res) => {
-            chai.request(server)
-              .post('/admin/users')
-              .send(notAnAdmin)
-              .set('token', res.body.token)
-              .then(result => {
-                result.should.have.status(201);
-                User.findOne({ where: {email: notAnAdmin.email} }).then(user => {
-                  user.isAdmin.should.equal(true);
-                  done();
+        User.count().then(oldUsers => {
+          chai.request(server)
+            .post('/users/sessions')
+            .send(adminLogin)
+            .then((res) => {
+              chai.request(server)
+                .post('/admin/users')
+                .send(notAnAdmin)
+                .set('token', res.body.token)
+                .then(result => {
+                  result.should.have.status(201);
+                  User.count().then(newUsers => {
+                    newUsers.should.equal(oldUsers);
+                    done();
+                  });
                 });
-              });
-          });
+            });
+        });
       });
     });
 
