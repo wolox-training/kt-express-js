@@ -49,6 +49,8 @@
     "minimatch": "^3.0.4",
     "morgan": "^1.7.0",
     "pg": "^4.4.6",
+    "request": "^2.83.0",
+    "request-promise": "^4.2.2",
     "rollbar": "^2.3.6",
     "sequelize": "^3.30.0",
     "umzug": "^2.0.1",
