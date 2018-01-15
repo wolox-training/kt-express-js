@@ -4,7 +4,7 @@ exports.purchaseAlbum = (user, album) => {
 
   return new Promise((resolve, reject) => {
 
-    Album.findOne({ where: {userId : user.id} }).then(alreadyPurchased => {
+    Album.findOne({ where: {id: album.id, userId : user.id} }).then(alreadyPurchased => {
 
       if(alreadyPurchased){
         resolve(undefined);
