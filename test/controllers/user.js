@@ -15,6 +15,11 @@ const newUser = {
   password: '12345678'
 };
 
+const correctLogin = {
+  email: 'kevin.temes@wolox.com.ar',
+  password: '12345678'
+};
+
 /*
 * Testing the /users (POST) route
 */
@@ -111,11 +116,6 @@ describe('/POST users/sessions', () => {
 
   it('should successfully log a user', (done) => {
 
-    const correctLogin = {
-      email: 'kevin.temes@wolox.com.ar',
-      password: '12345678'
-    };
-
     chai.request(server)
       .post('/users')
       .send(newUser)
@@ -128,6 +128,7 @@ describe('/POST users/sessions', () => {
             res.should.have.status(200);
             expect(res.body).to.have.property('token');
             dictum.chai(res, 'User signin');
+
             done();
           });
 
@@ -190,6 +191,104 @@ describe('/POST users/sessions', () => {
           .then(() => done());
 
       });
+  });
+
+});
+
+/*
+* Testing the /users/list (POST) route
+*/
+describe('/POST users/list', () => {
+
+  const userOne = {
+    name: 'userOne',
+    lastName: 'userOne',
+    email: 'userOne@wolox.com',
+    password: '12345678'
+  };
+
+  const userTwo = {
+    name: 'userTwo',
+    lastName: 'userTwo',
+    email: 'userTwo@wolox.com',
+    password: '12345678'
+  };
+
+  beforeEach(() => {
+
+    User.create(newUser).then(res => {User.create(userOne).then(res => {User.create(userTwo);});});
+
+  });
+
+  it('should return all users from the database', (done) => {
+
+    chai.request(server)
+      .post('/users/sessions')
+      .send(correctLogin)
+      .then(res => {
+
+        chai.request(server)
+          .get('/users/list')
+          .set('token', res.body.token)
+          .then((res) => {
+            res.should.have.status(200);
+            res.body.users.should.include(
+              {name: 'Kevin', lastName: 'Temes', email: 'kevin.temes@wolox.com.ar'},
+              {name: 'userOne', lastName: 'userOne', email: 'userOne@wolox.com'}, 
+              {name: 'userTwo', lastName: 'userTwo', email: 'userTwo@wolox.com'}
+            );
+            dictum.chai(res, 'User list retrieval');
+            done();
+          });
+
+      });
+
+  });
+
+  it('should return only the second user', (done) => {
+
+    chai.request(server)
+      .post('/users/sessions')
+      .send(correctLogin)
+      .then(res => {
+        chai.request(server)
+          .get('/users/list?offset=1&limit=1')
+          .set('token', res.body.token)
+          .then((res) => {
+            res.should.have.status(200);
+            res.body.users.should.include( { name: 'userOne', lastName: 'userOne', email: 'userOne@wolox.com' } );
+            done();
+          });
+      });
+                
+  });
+
+  it('should return only the last user', (done) => {
+
+    chai.request(server)
+      .post('/users/sessions')
+      .send(correctLogin)
+      .then(res => {
+        chai.request(server)
+          .get('/users/list?offset=2&limit=1')
+          .set('token', res.body.token)
+          .then(res => {
+            res.should.have.status(200);
+            res.body.users.should.include({name: 'userTwo', lastName: 'userTwo', email: 'userTwo@wolox.com'});
+            done();
+          });
+      });
+
+  });
+
+  it('should deny access to the endpoint if the user is not logged in', (done) => {
+
+    chai.request(server)
+      .get('/users/list?offset=2&limit=1')
+      .catch(err => {
+        err.should.have.status(401);
+      }).then(() => done());
+
   });
 
 });
