@@ -13,3 +13,11 @@ exports.getAlbum = (id) => {
   return request(`${albumListUrl}/${id}`);
 
 };
+
+exports.getPhotoList = (id) => {
+
+  return new Promise((resolve, reject) => {
+    rp(config.common.urlRequests.photoList + id).then(response => resolve(response));
+  });
+
+};

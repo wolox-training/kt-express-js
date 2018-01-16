@@ -77,5 +77,27 @@ exports.purchaseList = (req, res, next) => {
     return res.status(200).send({albums: albums});
   });
   
+exports.photoList = (req, res, next) => {
+
+  logger.info(`User ${req.user.email} requested the photos of an album with ID ${req.query.id}`);
+
+  if(!req.query.id || isNaN(req.query.id)){
+    return next(error.invalidAlbumId);
+  }
+
+  albumInteractor.checkPurchasedAlbum(req.user.id, req.query.id).then(album => {
+
+    if(!album){
+      return next(error.notOwned);
+    }else{
+      albumService.getPhotoList(album.id).then(photos => {
+        return res.status(200).send(JSON.parse(photos));
+      });
+    }
+
+  }).catch(error => {
+    logger.error(`Unhandled error exception! Details: ${error.message}`);
+    return res.status(500).send(error.message);
+  });
 
 };

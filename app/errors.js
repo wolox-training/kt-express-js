@@ -47,3 +47,7 @@ exports.invalidUserId = {
   statusCode: 400,
   message: 'Invalid user Id'
 };
+exports.notOwned = {
+  statusCode: 403,
+  message: 'You must purchase that album first to be able to visualize its photos.'
+};

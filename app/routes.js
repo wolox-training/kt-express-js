@@ -16,5 +16,6 @@ exports.init = (app) => {
   app.get('/albums', auth.checkCredentials, album.list);
   app.post('/albums', [auth.checkCredentials, albumValidator.validAlbumId], album.purchase);
   app.get('/users/albums', auth.checkCredentials, album.purchaseList);
+  app.get('/users/albums/photos', auth.checkCredentials, album.photoList);
 
 };
