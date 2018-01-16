@@ -1,4 +1,4 @@
-const rp = require('request-promise'),
+const request = require('request-promise'),
   logger = require('../logger'),
   config = require('../../config');
 
@@ -6,7 +6,7 @@ exports.listRequest = (req, res, next) => {
 
   logger.info(`Attempting GET request to url ${config.common.urlRequests.albumList}`);
 
-  rp(config.common.urlRequests.albumList).then(response => {
+  request(config.common.urlRequests.albumList).then(response => {
 
     logger.info(`Response received from ${config.common.urlRequests.albumList}`);
     return res.status(200).send(JSON.parse(response));

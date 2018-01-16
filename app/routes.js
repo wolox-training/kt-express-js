@@ -9,6 +9,6 @@ exports.init = (app) => {
   app.post('/users/sessions', userValidator.validateLoginInput, user.signin);
   app.get('/users/list', auth.checkCredentials, user.list);
 
-  app.get('/albums', [], album.list);
+  app.get('/albums', auth.checkCredentials, album.list);
 
 };

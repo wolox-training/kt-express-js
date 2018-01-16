@@ -47,7 +47,7 @@ describe('/GET albums', () => {
     chai.request(server)
       .get('/albums')
       .catch(err => {
-        err.should.have.status(401);
+        err.should.have.status(401);;
       }).then(() => done());
 
   });
