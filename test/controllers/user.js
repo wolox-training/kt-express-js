@@ -3,6 +3,7 @@ const chai = require('chai'),
   server = require('../../app'),
   should = chai.should(),
   expect = chai.expect,
+  assert = chai.assert,
   dictum = require('dictum.js'),
   User = require('../../app/models').users;
 
@@ -278,7 +279,6 @@ describe('/POST users/list', () => {
             done();
           });
       });
-
   });
 
   it('should deny access to the endpoint if the user is not logged in', (done) => {
@@ -288,6 +288,133 @@ describe('/POST users/list', () => {
       .catch(err => {
         err.should.have.status(401);
       }).then(() => done());
+
+  });
+
+});
+
+/*
+* Testing the /admin/users (POST) route
+*/
+describe('/POST admin/users', () => {
+
+  const admin = {
+    name: 'Kevin',
+    lastName: 'Temes',
+    email: 'kevin.temes@wolox.com.ar',
+    password: '12345678',
+    isAdmin: true
+  };
+
+  const notAnAdmin = {
+    name: 'Not',
+    lastName: 'AnAdmin',
+    email: 'not.an.admin@wolox.com',
+    password: '12345678'
+  };
+
+  const newAdmin = {
+    name: 'Admin',
+    lastName: 'Admin',
+    email: 'admin@wolox.com',
+    password: '12345678'
+  };
+
+  const adminLogin = {
+    email: 'kevin.temes@wolox.com.ar',
+    password: '12345678'
+  };
+
+  const notAdminLogin = {
+    email: 'not.an.admin@wolox.com',
+    password: '12345678'
+  };
+
+  it('should successfully create an admin user', (done) => {
+
+    User.create(admin).then(res => {
+
+      User.count().then(oldUsers => {
+
+        chai.request(server)
+          .post('/users/sessions')
+          .send(adminLogin)
+          .then((res) => {
+            chai.request(server)
+              .post('/admin/users')
+              .send(newAdmin)
+              .set('token', res.body.token)
+              .then(result => {
+                result.should.have.status(201);
+                User.count().then(newUsers => {
+                  newUsers.should.equal(oldUsers + 1);
+                  done();
+                });
+              }).catch(err => {
+                console.log(err);
+              });
+          });        
+
+      });
+
+    });
+
+  });
+
+  it('should successfully update a regular user to an admin user', (done) => {
+
+    User.create(admin).then(res => {
+      User.create(notAnAdmin).then(res => {
+        User.count().then(oldUsers => {
+          chai.request(server)
+            .post('/users/sessions')
+            .send(adminLogin)
+            .then((res) => {
+              chai.request(server)
+                .post('/admin/users')
+                .send(notAnAdmin)
+                .set('token', res.body.token)
+                .then(result => {
+                  result.should.have.status(201);
+                  User.count().then(newUsers => {
+                    newUsers.should.equal(oldUsers);
+                    done();
+                  });
+                });
+            });
+        });
+      });
+    });
+
+  });
+
+  it('should deny access to the endpoint if the user is not logged in', (done) => {
+
+    chai.request(server)
+      .post('/admin/users')
+      .send(newAdmin)
+      .catch(err => {
+        err.should.have.status(401);
+      }).then(() => done());
+
+  });
+
+  it('should deny access to the endpoint if the user is logged in but its not an administrator', (done) => {
+
+    User.create(notAnAdmin).then(res => {
+      chai.request(server)
+        .post('/users/sessions')
+        .send(notAdminLogin)
+        .then((res) => {
+          chai.request(server)
+            .post('/admin/users')
+            .send(newAdmin)
+            .set('token', res.body.token)
+            .catch(err => {
+              err.should.have.status(403);
+            }).then(() => done());
+        });
+    });
 
   });
 

@@ -19,9 +19,17 @@ exports.checkCredentials = (req, res, next) => {
     if(!user){
       return next(errors.invalidCredentialError);
     }
-
+    req.isAdmin = user.isAdmin;
     next();
   
   });
 
+};
+
+exports.isAdmin = (req, res, next, user) => {
+
+  if(!req.isAdmin){
+    return next(errors.notAnAdmin);
+  }
+  next();
 };

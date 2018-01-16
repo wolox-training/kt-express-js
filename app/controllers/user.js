@@ -8,35 +8,11 @@ const User = require('../models').users,
 
 exports.create = (req, res, next) => {
 
-  const input = emptyToNull(req.body);
+  let input = emptyToNull(req.body);
 
-  User.create({
-    name: input.name,
-    lastName: input.lastName,
-    email: input.email,
-    password: input.password
-  })
-    .then(result => {
-      logger.info(`User ${input.name} created successfully.`);
-      res.status(201).send({
-        name: result.name,
-        lastName: result.lastName,
-        email: result.email
-      });
+  input.isAdmin = false;
 
-    }).catch(error => {
-
-      let errorBag = [];
-      if(error.errors){
-        errorBag = error.errors.map(err => err.message);
-        logger.error(`A database error occured when attempting a user signup. Details: ${errorBag}.`);
-        res.status(401).send(errorBag);
-      }else{
-        logger.error(`Unhandled error! details: ${error}`);
-        res.status(500).send(error);
-      }
-
-    });
+  newUser(req, res, next, input);
 
 };
 
@@ -127,5 +103,67 @@ const emptyToNull = (input) => {
   });
 
   return newInput;
+
+};
+
+const newUser = (req, res, next, input) => {
+
+  User.create({
+    name: input.name,
+    lastName: input.lastName,
+    email: input.email,
+    password: input.password,
+    isAdmin: input.isAdmin
+  })
+    .then(result => {
+
+      logger.info(`User ${input.email} created successfully.`);
+      
+      return res.status(201).send({
+        name: result.name,
+        lastName: result.lastName,
+        email: result.email
+      });
+
+    }).catch(error => {
+
+      let errorBag = [];
+      if(error.errors){
+        errorBag = error.errors.map(err => err.message);
+        logger.error(`A database error occured when attempting a user signup. Details: ${errorBag}.`);
+        return res.status(401).send(errorBag);
+      }else{
+        logger.error(`Unhandled error! details: ${error}`);
+        return res.status(500).send(error);
+      }
+
+    });
+
+};
+
+exports.createAdmin = (req, res, next) => {
+
+  let input = emptyToNull(req.body);
+
+  User.findOne({ where: {email: input.email} }).then(loggedUser => {
+
+    input.isAdmin = true;
+
+    if(!loggedUser) {
+      newUser(req, res, next, input);
+    }else{
+      loggedUser.update(input).then(updated => {
+        return res.status(201).send({
+          name: updated.name,
+          lastName: updated.lastName,
+          email: updated.email
+        });
+      });
+    }
+
+  }).catch(err => {
+    logger.error(`Unhandled error! details: ${err}`);
+    return next(errors.defaultError);
+  });
 
 };

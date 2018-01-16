@@ -13,3 +13,8 @@ exports.invalidCredentialError = {
   statusCode: 401,
   message : 'Invalid Email/Password combination'
 };
+
+exports.notAnAdmin = {
+  statusCode: 403,
+  message: 'You must be an Administrator to access this endpoint.'
+};

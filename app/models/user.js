@@ -39,6 +39,10 @@ module.exports = (sequelize, DataTypes) => {
           }
         }
       }
+    },
+    isAdmin: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false
     }
   }, {
     classMethods: {
