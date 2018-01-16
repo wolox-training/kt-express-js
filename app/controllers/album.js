@@ -58,3 +58,23 @@ exports.purchase = (req, res, next) => {
   });
 
 };
+
+exports.purchaseList = (req, res, next) => {
+
+  try {
+    validationResult(req).throw();
+  } catch (err) {
+    return next(error.invalidUserId);
+  }
+
+  id = req.query.id;
+
+  if((id != req.user.id) && !req.user.isAdmin){
+    return next(error.notAnAdmin);
+  }else{
+    albumInteractor.getAlbumsByUser(id).then(albums => {
+      return res.status(200).send(albums);
+    });
+  }
+
+};

@@ -4,3 +4,5 @@ exports.validateLoginInput = [
   check('email').isEmail().withMessage('Email is invalid'), 
   check('password', 'passwords must be at least 8 chars long').isLength({ min: 8 })
 ];
+
+exports.validUserId = [check('id').isInt().withMessage('Invalid User id')];
