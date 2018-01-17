@@ -32,11 +32,10 @@ const oneAlbum = {
   title: 'quidem molestiae enim'
 };
 
-const firstAlbum = { id: 1 };
 const adminUser = {
-  name: 'Admin',
-  lastName: 'Admin',
-  email: 'admin@wolox.com',
+  name: 'Kevin',
+  lastName: 'Temes',
+  email: 'admin@wolox.com.ar',
   password: '12345678',
   isAdmin: true
 };
@@ -47,7 +46,7 @@ const correctLogin = {
 };
 
 const adminLogin = {
-  email: 'admin@wolox.com',
+  email: 'admin@wolox.com.ar',
   password: '12345678'
 };
 
@@ -206,26 +205,25 @@ describe('/GET users/albums', () => {
   let adminUserId;
 
   beforeEach(() => {
-    User.create(adminUser).then(admin => {
-      adminUserId = admin.id;
-      User.create(newUser).then(user => {
-        newUserId = user.id;
-        User.create(dummyUser).then(dummy => {
-          dummyUserId = dummy.id;
+    
+    User.create(newUser).then(user => {
+      newUserId = user.id;
+      User.create(dummyUser).then(dummy => {
+        dummyUserId = dummy.id;
+        Album.create({
+          id: 1,
+          userId: newUserId,
+          title: 'Album 1'
+        }).then(res => {
           Album.create({
-            id: 1,
-            userId: user.id,
-            title: 'Album 1'
-          }).then(res => {
-            Album.create({
-              id: 2,
-              userId: user.id,
-              title: 'Album 2'
-            });
+            id: 2,
+            userId: newUserId,
+            title: 'Album 2'
           });
         });
       });
     });
+    
   });
 
   it('should retrieve all albums owned by the user', (done) => {
@@ -262,21 +260,22 @@ describe('/GET users/albums', () => {
 
   });
 
-  it.only('should allow an admin user to access another user`s purchase list', (done) => {
-
-    chai.request(server)
-      .post('/users/sessions')
-      .send(adminLogin)
-      .then(auth => {
-        chai.request(server)
-          .get(`/users/albums?id=${dummyUserId}`)
-          .set('token', auth.body.token)
-          .then(res => {
-            res.should.have.status(200);
-            res.body.albums.length.should.equal(2);
-            done();
-          });
-      });
+  it('should allow an admin user to access another user`s purchase list', (done) => {
+    User.create(adminUser).then(admin => {
+      chai.request(server)
+        .post('/users/sessions')
+        .send(adminLogin)
+        .then(auth => {
+          chai.request(server)
+            .get(`/users/albums?id=${newUserId}`)
+            .set('token', auth.body.token)
+            .then(res => {
+              res.should.have.status(200);
+              res.body.albums.length.should.equal(2);
+              done();
+            });
+        });
+    });
 
   });
 
