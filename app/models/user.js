@@ -1,6 +1,7 @@
 'use strict';
 
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt'),
+  albums = require('../models').albums;
 
 module.exports = (sequelize, DataTypes) => {
   var user = sequelize.define('users', {
@@ -47,7 +48,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     classMethods: {
       associate: function(models) {
-        // associations can be defined here
+        user.hasMany(models.albums, {as: 'albums'}); 
       },
     },
     hooks: {
