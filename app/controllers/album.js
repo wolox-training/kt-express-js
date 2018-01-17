@@ -81,11 +81,11 @@ exports.photoList = (req, res, next) => {
 
   logger.info(`User ${req.user.email} requested the photos of an album with ID ${req.query.id}`);
 
-  if(!req.query.id || isNaN(req.query.id)){
+  if(!req.params.albumId || isNaN(req.params.albumId)){
     return next(error.invalidAlbumId);
   }
 
-  albumInteractor.checkPurchasedAlbum(req.user.id, req.query.id).then(album => {
+  albumInteractor.checkPurchasedAlbum(req.user.id, req.params.albumId).then(album => {
 
     if(!album){
       return next(error.notOwned);

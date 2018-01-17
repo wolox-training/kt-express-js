@@ -1,10 +1,11 @@
-const request = require('request-promise'),
+const rp = require('request-promise'),
   config = require('../../config'),
-  albumListUrl = config.common.urlRequests.albumList;
+  albumList = `${config.common.urlRequests.base}${config.common.urlRequests.albumList}`,
+  photoList = `${config.common.urlRequests.base}${config.common.urlRequests.photoList}`;
 
 exports.listRequest = () => {
 
-  return request(albumListUrl);
+  return request(albumList);
 
 };
 
@@ -14,10 +15,8 @@ exports.getAlbum = (id) => {
 
 };
 
-exports.getPhotoList = (id) => {
+exports.getPhotoList = (albumId) => {
 
-  return new Promise((resolve, reject) => {
-    rp(config.common.urlRequests.photoList + id).then(response => resolve(response));
-  });
+  rp(`${photoList}${albumId}`);
 
 };
