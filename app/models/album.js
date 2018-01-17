@@ -1,7 +1,5 @@
 'use strict';
 
-const User = require('../models').users;
-
 module.exports = (sequelize, DataTypes) => {
   var album = sequelize.define('albums', {
     id: {
@@ -12,6 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     userId: {
       type: DataTypes.INTEGER,
+      primaryKey: true,
       allowNull: false,
       notEmpty: true
     },

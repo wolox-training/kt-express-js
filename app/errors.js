@@ -30,7 +30,7 @@ exports.notAnAlbum = {
 };
 
 exports.alreadyPurchased = {
-  statusCode: 400,
+  statusCode: 422,
   message: 'You have already purchased that Album.'
 };
 

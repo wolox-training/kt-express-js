@@ -7,7 +7,7 @@ exports.purchaseAlbum = (user, album) => {
     Album.findOne({ where: {id: album.id, userId : user.id} }).then(alreadyPurchased => {
 
       if(alreadyPurchased){
-        resolve(undefined);
+        resolve(false);
       }else{
         Album.create({
           id: album.id,

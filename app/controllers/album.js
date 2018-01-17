@@ -7,13 +7,13 @@ const albumService = require('../services/album'),
 
 exports.list = (req, res, next) => {
 
-  logger.info(`Attempting GET request to url ${config.common.urlRequests.albumList}`);
+  logger.info('Attempting to get all albums');
 
   albumService.listRequest().then(albums => {
-    logger.info(`Response received from ${config.common.urlRequests.albumList}`);
+    logger.info('Albums retrieved!');
     return res.status(200).send(JSON.parse(albums));
   }).catch(error => {
-    logger.error(`An error occured while attempting a GET request to url ${config.common.urlRequests.albumList}: ${error.message}`);
+    logger.error(`An error occured while attempting to get the albums list. Details: ${error.message}`);
     return res.status(502).send(error.message);
   });
 
@@ -29,27 +29,26 @@ exports.purchase = (req, res, next) => {
 
   logger.info(`User ${req.user.email} requested to purchase an Album, ID ${req.body.id}`);
 
-  albumService.checkAlbum(req.body.id).then(album => {
+  albumService.getAlbum(req.body.id).then(album => {
     if(!album){
       return next(errors.notAnAlbum);
-    }else{
-
-      albumInteractor.purchaseAlbum(req.user, JSON.parse(album)).then(purchased => {
-
-        if(!purchased){
-          return next(error.alreadyPurchased);
-        }else{
-          return res.status(201).send({
-            id: purchased.id,
-            title: purchased.title
-          });
-        }
-
-      });
-      
     }
-  }).catch(error => {
 
+    albumInteractor.purchaseAlbum(req.user, JSON.parse(album)).then(purchased => {
+
+      if(!purchased){
+        return next(error.alreadyPurchased);
+      }else{
+        return res.status(201).send({
+          id: purchased.id,
+          title: purchased.title
+        });
+      }
+
+    });
+    
+  }).catch(error => {
+    console.log(error);
     if(error.statusCode === 404){
       return next(error.notAnAlbum);
     }else{

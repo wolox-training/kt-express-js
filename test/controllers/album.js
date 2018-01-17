@@ -125,7 +125,7 @@ describe('/POST albums', () => {
                   .send(firstAlbum)
                   .set('token', auth.body.token)
                   .catch(err => {
-                    err.should.have.status(400);
+                    err.should.have.status(422);
                     Album.count().then(secondAlbumCount => {
                       secondAlbumCount.should.equal(firstAlbumCount);
                     });
