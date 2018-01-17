@@ -2,7 +2,6 @@ const albumService = require('../services/album'),
   albumInteractor = require('../interactors/album'),
   error = require('../errors'),
   logger = require('../logger'),
-  config = require('../../config'),
   { validationResult } = require('express-validator/check');
 
 exports.list = (req, res, next) => {
@@ -38,23 +37,21 @@ exports.purchase = (req, res, next) => {
 
       if(!purchased){
         return next(error.alreadyPurchased);
-      }else{
-        return res.status(201).send({
-          id: purchased.id,
-          title: purchased.title
-        });
       }
-
+      return res.status(201).send({
+        id: purchased.id,
+        title: purchased.title
+      });
+      
     });
     
   }).catch(error => {
-    console.log(error);
     if(error.statusCode === 404){
       return next(error.notAnAlbum);
-    }else{
-      logger.error(`Unhandled error exception! Details: ${error.message}`);
-      return res.status(500).send(error.message);
     }
+    logger.error(`Unhandled error exception! Details: ${error.message}`);
+    return res.status(500).send(error.message);
+    
 
   });
 
