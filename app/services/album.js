@@ -1,4 +1,4 @@
-const rp = require('request-promise'),
+const request = require('request-promise'),
   config = require('../../config'),
   albumList = `${config.common.urlRequests.base}${config.common.urlRequests.albumList}`,
   photoList = `${config.common.urlRequests.base}${config.common.urlRequests.photoList}`;
@@ -11,12 +11,12 @@ exports.listRequest = () => {
 
 exports.getAlbum = (id) => {
 
-  return request(`${albumListUrl}/${id}`);
+  return request(`${albumList}/${id}`);
 
 };
 
 exports.getPhotoList = (albumId) => {
 
-  rp(`${photoList}${albumId}`);
+  return request(`${photoList}${albumId}`);
 
 };

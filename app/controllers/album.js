@@ -79,7 +79,7 @@ exports.purchaseList = (req, res, next) => {
   
 exports.photoList = (req, res, next) => {
 
-  logger.info(`User ${req.user.email} requested the photos of an album with ID ${req.query.id}`);
+  logger.info(`User ${req.user.email} requested the photos of an album with ID ${req.params.albumId}`);
 
   if(!req.params.albumId || isNaN(req.params.albumId)){
     return next(error.invalidAlbumId);
@@ -90,6 +90,7 @@ exports.photoList = (req, res, next) => {
     if(!album){
       return next(error.notOwned);
     }else{
+      console.log(album.id);
       albumService.getPhotoList(album.id).then(photos => {
         return res.status(200).send(JSON.parse(photos));
       });
