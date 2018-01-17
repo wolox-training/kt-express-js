@@ -42,9 +42,7 @@ describe('/GET albums', () => {
 
   it('should successfully retrieve a list of albums', (done) => {
 
-    nock(url)
-      .get('')
-      .reply(200, [oneAlbum]);
+    nock(url).get('').reply(200, [oneAlbum]);
   
     User.create(newUser).then(res => {
       chai.request(server)
@@ -81,6 +79,10 @@ describe('/GET albums', () => {
 * Testing the /albums (POST) route
 */
 describe('/POST albums', () => {
+
+  beforeEach(() => {
+    nock(url).get('/1').query(true).reply(200, oneAlbum);
+  });
 
   it('should successfully purchase an album', (done) => {
 
@@ -120,6 +122,7 @@ describe('/POST albums', () => {
             .set('token', auth.body.token)
             .then(res => {
               Album.count().then(firstAlbumCount => {
+                nock(url).get('/1').query(true).reply(200, oneAlbum);
                 chai.request(server)
                   .post('/albums')
                   .send(firstAlbum)
