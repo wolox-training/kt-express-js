@@ -33,8 +33,21 @@ const oneAlbum = {
 };
 
 const firstAlbum = { id: 1 };
+const adminUser = {
+  name: 'Admin',
+  lastName: 'Admin',
+  email: 'admin@wolox.com',
+  password: '12345678',
+  isAdmin: true
+};
+
 const correctLogin = {
   email: 'kevin.temes@wolox.com',
+  password: '12345678'
+};
+
+const adminLogin = {
+  email: 'admin@wolox.com',
   password: '12345678'
 };
 
@@ -190,21 +203,25 @@ describe('/GET users/albums', () => {
 
   let newUserId;
   let dummyUserId;
+  let adminUserId;
 
   beforeEach(() => {
-    User.create(newUser).then(user => {
-      newUserId = user.id;
-      User.create(dummyUser).then(dummy => {
-        dummyUserId = dummy.id;
-        Album.create({
-          id: 1,
-          userId: user.id,
-          title: 'Album 1'
-        }).then(res => {
+    User.create(adminUser).then(admin => {
+      adminUserId = admin.id;
+      User.create(newUser).then(user => {
+        newUserId = user.id;
+        User.create(dummyUser).then(dummy => {
+          dummyUserId = dummy.id;
           Album.create({
-            id: 2,
+            id: 1,
             userId: user.id,
-            title: 'Album 2'
+            title: 'Album 1'
+          }).then(res => {
+            Album.create({
+              id: 2,
+              userId: user.id,
+              title: 'Album 2'
+            });
           });
         });
       });
@@ -218,11 +235,11 @@ describe('/GET users/albums', () => {
       .send(correctLogin)
       .then(auth => {
         chai.request(server)
-          .get('/users/albums?id=' + newUserId)
+          .get(`/users/albums?id=${newUserId}`)
           .set('token', auth.body.token)
           .then(res => {
             res.should.have.status(200);
-            res.body.length.should.equal(2);
+            res.body.albums.length.should.equal(2);
             done();
           });
       });    
@@ -236,7 +253,7 @@ describe('/GET users/albums', () => {
       .send(correctLogin)
       .then(auth => {
         chai.request(server)
-          .get('/users/albums?id=' + dummyUserId)
+          .get(`/users/albums?id=${dummyUserId}`)
           .set('token', auth.body.token)
           .catch(err => {
             err.should.have.status(403);
@@ -245,9 +262,27 @@ describe('/GET users/albums', () => {
 
   });
 
+  it.only('should allow an admin user to access another user`s purchase list', (done) => {
+
+    chai.request(server)
+      .post('/users/sessions')
+      .send(adminLogin)
+      .then(auth => {
+        chai.request(server)
+          .get(`/users/albums?id=${dummyUserId}`)
+          .set('token', auth.body.token)
+          .then(res => {
+            res.should.have.status(200);
+            res.body.albums.length.should.equal(2);
+            done();
+          });
+      });
+
+  });
+
   it('should deny access to the endpoint if the user is not logged in', (done) => {
     chai.request(server)
-      .get('/users/albums?id=' + newUserId)
+      .get(`/users/albums?id=${newUserId}`)
       .catch(err => {
         err.should.have.status(401);
       }).then(() => done());

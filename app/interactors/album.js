@@ -26,12 +26,6 @@ exports.purchaseAlbum = (user, album) => {
 
 exports.getAlbumsByUser = (id) => {
 
-  return new Promise((resolve, reject) => {
-
-    Album.findAll({ where: {userId: id} }).then(albums => {
-      resolve(albums);
-    });
-
-  });
+  return Album.findAll({ where: {userId: id} });
 
 };

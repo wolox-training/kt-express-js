@@ -71,10 +71,11 @@ exports.purchaseList = (req, res, next) => {
 
   if((id != req.user.id) && !req.user.isAdmin){
     return next(error.notAnAdmin);
-  }else{
-    albumInteractor.getAlbumsByUser(id).then(albums => {
-      return res.status(200).send(albums);
-    });
   }
+
+  albumInteractor.getAlbumsByUser(id).then(albums => {
+    return res.status(200).send({albums: albums});
+  });
+  
 
 };
