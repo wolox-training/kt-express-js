@@ -33,14 +33,16 @@ exports.purchase = (req, res, next) => {
       return next(errors.notAnAlbum);
     }
 
-    albumInteractor.purchaseAlbum(req.user, JSON.parse(album)).then(purchased => {
+    const parsedAlbum = JSON.parse(album);
+
+    albumInteractor.purchaseAlbum(req.user, parsedAlbum).then(purchased => {
 
       if(!purchased){
         return next(error.alreadyPurchased);
       }
       return res.status(201).send({
-        id: purchased.id,
-        title: purchased.title
+        id: parsedAlbum.id,
+        title: parsedAlbum.title
       });
       
     });

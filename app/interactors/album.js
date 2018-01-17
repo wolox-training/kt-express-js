@@ -14,7 +14,7 @@ exports.purchaseAlbum = (user, album) => {
           userId: user.id,
           title: album.title
         }).then(success => {
-          resolve(success);
+          resolve(true);
         });
       }
 
