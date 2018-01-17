@@ -15,5 +15,6 @@ exports.init = (app) => {
   //Album endpoint routes
   app.get('/albums', auth.checkCredentials, album.list);
   app.post('/albums', [auth.checkCredentials, albumValidator.validAlbumId], album.purchase);
+  app.get('/users/albums', auth.checkCredentials, album.purchaseList);
 
 };

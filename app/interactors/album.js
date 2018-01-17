@@ -4,7 +4,7 @@ exports.purchaseAlbum = (user, album) => {
 
   return new Promise((resolve, reject) => {
 
-    Album.findOne({ where: {id: album.id, userId : user.id} }).then(alreadyPurchased => {
+    Album.findOne({ where: {id: album.id, userId: user.id} }).then(alreadyPurchased => {
 
       if(alreadyPurchased){
         resolve(false);
@@ -21,5 +21,11 @@ exports.purchaseAlbum = (user, album) => {
     });
 
   });
+
+};
+
+exports.getAlbumsByUser = (id) => {
+
+  return Album.findAll({ where: {userId: id} });
 
 };

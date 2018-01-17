@@ -15,12 +15,14 @@ const url = config.common.urlRequests.albumList;
 const newUser = {
   name: 'Kevin',
   lastName: 'Temes',
-  email: 'kevin.temes@wolox.com.ar',
+  email: 'kevin.temes@wolox.com',
   password: '12345678'
 };
 
-const correctLogin = {
-  email: 'kevin.temes@wolox.com.ar',
+const dummyUser = {
+  name: 'Dummy',
+  lastName: 'User',
+  email: 'dummy.user@wolox.com',
   password: '12345678'
 };
 
@@ -30,9 +32,28 @@ const oneAlbum = {
   title: 'quidem molestiae enim'
 };
 
-const firstAlbum = { id: 1 };
+const adminUser = {
+  name: 'Kevin',
+  lastName: 'Temes',
+  email: 'admin@wolox.com.ar',
+  password: '12345678',
+  isAdmin: true
+};
 
-const invalidAlbum = {id : 'error'};
+const correctLogin = {
+  email: 'kevin.temes@wolox.com',
+  password: '12345678'
+};
+
+const adminLogin = {
+  email: 'admin@wolox.com.ar',
+  password: '12345678'
+};
+
+const firstAlbum = { id: 1 },
+  secondAlbum = {id: 2},
+  thirdAlbum = {id: 3},
+  invalidAlbum = {id : 'error'};
 
 
 /*
@@ -170,6 +191,100 @@ describe('/POST albums', () => {
         err.should.have.status(401);
       }).then(() => done());
 
+  });
+
+});
+
+/*
+* Testing the /albums (POST) route
+*/
+describe('/GET users/albums', () => {
+
+  let newUserId;
+  let dummyUserId;
+  let adminUserId;
+
+  beforeEach(() => {
+    
+    User.create(newUser).then(user => {
+      newUserId = user.id;
+      User.create(dummyUser).then(dummy => {
+        dummyUserId = dummy.id;
+        Album.create({
+          id: 1,
+          userId: newUserId,
+          title: 'Album 1'
+        }).then(res => {
+          Album.create({
+            id: 2,
+            userId: newUserId,
+            title: 'Album 2'
+          });
+        });
+      });
+    });
+    
+  });
+
+  it('should retrieve all albums owned by the user', (done) => {
+
+    chai.request(server)
+      .post('/users/sessions')
+      .send(correctLogin)
+      .then(auth => {
+        chai.request(server)
+          .get(`/users/albums?id=${newUserId}`)
+          .set('token', auth.body.token)
+          .then(res => {
+            res.should.have.status(200);
+            res.body.albums.length.should.equal(2);
+            done();
+          });
+      });    
+
+  });
+
+  it('should prevent a regular user from accessing another user`s purchase list', (done) => {
+
+    chai.request(server)
+      .post('/users/sessions')
+      .send(correctLogin)
+      .then(auth => {
+        chai.request(server)
+          .get(`/users/albums?id=${dummyUserId}`)
+          .set('token', auth.body.token)
+          .catch(err => {
+            err.should.have.status(403);
+          }).then(() => done());
+      });
+
+  });
+
+  it('should allow an admin user to access another user`s purchase list', (done) => {
+    User.create(adminUser).then(admin => {
+      chai.request(server)
+        .post('/users/sessions')
+        .send(adminLogin)
+        .then(auth => {
+          chai.request(server)
+            .get(`/users/albums?id=${newUserId}`)
+            .set('token', auth.body.token)
+            .then(res => {
+              res.should.have.status(200);
+              res.body.albums.length.should.equal(2);
+              done();
+            });
+        });
+    });
+
+  });
+
+  it('should deny access to the endpoint if the user is not logged in', (done) => {
+    chai.request(server)
+      .get(`/users/albums?id=${newUserId}`)
+      .catch(err => {
+        err.should.have.status(401);
+      }).then(() => done());
   });
 
 });
