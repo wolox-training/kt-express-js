@@ -53,8 +53,6 @@ const mockedPhoto = {
   thumbnailUrl: 'http://placehold.it/150/92c952'
 };
 
-const firstAlbum = { id: 1 };
-
 const adminLogin = {
   email: 'admin@wolox.com.ar',
   password: '12345678'
@@ -296,6 +294,65 @@ describe('/GET users/albums', () => {
       .catch(err => {
         err.should.have.status(401);
       }).then(() => done());
+  });
+
+});
+
+/*
+* Testing the /user/albums/photos (GET) route
+*/
+describe('/GET users/albums/photos', () => {
+
+  beforeEach(() => {
+    User.create(newUser).then(user => {
+      Album.create({id: 1, userId: user.id, title: 'test'});
+    });
+    nock(`${photoList}/1`).get('').query(true).reply(200, mockedPhoto);
+  });
+
+  it('should successfully retrieve all the photos of a purchased album', (done) => {
+
+    chai.request(server)
+      .post('/users/sessions')
+      .send(correctLogin)
+      .then(auth => {
+        nock(photoList).get('/1').query(true).reply(200, mockedPhoto);
+        chai.request(server)
+          .get('/users/albums/1/photos')
+          .set('token', auth.body.token)
+          .then(res => {
+            res.should.have.status(200);
+            res.body.should.include(mockedPhoto);
+            done();
+          });
+      });
+
+  });
+
+  it('should throw an error when requesting the photos of an album not purchased by the user', (done) => {
+    
+    chai.request(server)
+      .post('/users/sessions')
+      .send(correctLogin)
+      .then(auth => {
+        chai.request(server)
+          .get('/users/albums/2/photos')
+          .set('token', auth.body.token)
+          .catch(err => {
+            err.should.have.status(403);
+          }).then(() => done());
+      });
+
+  });
+
+  it('should deny access to the endpoint if the user is not logged in', (done) => {
+
+    chai.request(server)
+      .get('/users/albums/2/photos')
+      .catch(err => {
+        err.should.have.status(401);
+      }).then(() => done());
+
   });
 
 });

@@ -24,6 +24,12 @@ exports.purchaseAlbum = (user, album) => {
 
 };
 
+exports.checkPurchasedAlbum = (userId, albumId) => {
+
+  return Album.findOne({ where: {id: albumId, userId: userId} });
+
+};
+
 exports.getAlbumsByUser = (id) => {
 
   return Album.findAll({ where: {userId: id} });

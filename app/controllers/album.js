@@ -76,7 +76,8 @@ exports.purchaseList = (req, res, next) => {
   albumInteractor.getAlbumsByUser(id).then(albums => {
     return res.status(200).send({albums: albums});
   });
-  
+};
+ 
 exports.photoList = (req, res, next) => {
 
   logger.info(`User ${req.user.email} requested the photos of an album with ID ${req.params.albumId}`);
