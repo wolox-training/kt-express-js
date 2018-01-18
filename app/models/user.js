@@ -44,6 +44,10 @@ module.exports = (sequelize, DataTypes) => {
     isAdmin: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
+    },
+    lastInvalidation: {
+      type: DataTypes.DATE,
+      allowNull: true
     }
   }, {
     classMethods: {

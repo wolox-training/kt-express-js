@@ -23,6 +23,10 @@ exports.checkCredentials = (req, res, next) => {
     if(sessionExpired(token.expirationDate)){
       return next(errors.sessionExpired);
     }
+    if(!sessionStillValid(token.creationDate, user.lastInvalidation)){
+      return next(errors.sessionExpired);
+    }
+    
     req.user = user;
     next();
   
@@ -30,7 +34,7 @@ exports.checkCredentials = (req, res, next) => {
 
 };
 
-exports.isAdmin = (req, res, next, user) => {
+exports.isAdmin = (req, res, next) => {
 
   if(!req.user.isAdmin){
     return next(errors.notAnAdmin);
@@ -40,4 +44,8 @@ exports.isAdmin = (req, res, next, user) => {
 
 const sessionExpired = (date) => {
   return moment().diff(date, config.common.session.unit) > 0;
+};
+
+const sessionStillValid = (creationDate, lastInvalidation) => {
+  return creationDate > lastInvalidation;
 };
