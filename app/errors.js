@@ -43,7 +43,13 @@ exports.notAnAdmin = {
   statusCode: 403,
   message: 'You must be an Administrator to access this endpoint.'
 };
+
 exports.invalidUserId = {
   statusCode: 400,
   message: 'Invalid user Id'
+};
+
+exports.sessionExpired = {
+  statusCode: 403,
+  message: 'You session credentials have expired.'
 };

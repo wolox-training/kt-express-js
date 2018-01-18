@@ -5,7 +5,8 @@ const chai = require('chai'),
   expect = chai.expect,
   assert = chai.assert,
   dictum = require('dictum.js'),
-  User = require('../../app/models').users;
+  User = require('../../app/models').users,
+  dotenv = require('dotenv').config({ path: `${__dirname}/.env` });
 
 chai.use(chaiHttp);
 
@@ -17,6 +18,26 @@ const newUser = {
 };
 
 const correctLogin = {
+  email: 'kevin.temes@wolox.com.ar',
+  password: '12345678'
+};
+
+const newAdmin = {
+  name: 'Admin',
+  lastName: 'Admin',
+  email: 'admin@wolox.com',
+  password: '12345678'
+};
+
+const admin = {
+  name: 'Kevin',
+  lastName: 'Temes',
+  email: 'kevin.temes@wolox.com.ar',
+  password: '12345678',
+  isAdmin: true
+};
+
+const adminLogin = {
   email: 'kevin.temes@wolox.com.ar',
   password: '12345678'
 };
@@ -298,30 +319,10 @@ describe('/POST users/list', () => {
 */
 describe('/POST admin/users', () => {
 
-  const admin = {
-    name: 'Kevin',
-    lastName: 'Temes',
-    email: 'kevin.temes@wolox.com.ar',
-    password: '12345678',
-    isAdmin: true
-  };
-
   const notAnAdmin = {
     name: 'Not',
     lastName: 'AnAdmin',
     email: 'not.an.admin@wolox.com',
-    password: '12345678'
-  };
-
-  const newAdmin = {
-    name: 'Admin',
-    lastName: 'Admin',
-    email: 'admin@wolox.com',
-    password: '12345678'
-  };
-
-  const adminLogin = {
-    email: 'kevin.temes@wolox.com.ar',
     password: '12345678'
   };
 
@@ -413,6 +414,59 @@ describe('/POST admin/users', () => {
             .catch(err => {
               err.should.have.status(403);
             }).then(() => done());
+        });
+    });
+
+  });
+
+});
+
+/*
+* Testing the expiration of session tokens
+*/
+
+describe('Token Expiration', () => {
+
+  it('Should return an error when the user provides an expired token', (done) => {
+
+    process.env.NODE_API_JWT_SESSION_DURATION_TEST ='1';
+    process.env.NODE_API_JWT_SESSION_DURATION_UNIT_TEST = 'ms';
+
+    User.create(newUser).then(user => {
+      chai.request(server)
+        .post('/users/sessions')
+        .send(correctLogin)
+        .then(auth => {
+          chai.request(server)
+            .post('/admin/users')
+            .send(newAdmin)
+            .set('token', auth.body.token)
+            .catch(err => {
+              err.should.have.status(403);
+            }).then(() => done());
+        });
+    });
+
+  });
+
+  it('Should allow access to an endpoint if the user credentials are valid and havent expired', (done) => {
+
+    process.env.NODE_API_JWT_SESSION_DURATION_TEST ='1';
+    process.env.NODE_API_JWT_SESSION_DURATION_UNIT_TEST = 'm';
+
+    User.create(admin).then(user => {
+      chai.request(server)
+        .post('/users/sessions')
+        .send(adminLogin)
+        .then(auth => {
+          chai.request(server)
+            .post('/admin/users')
+            .send(newAdmin)
+            .set('token', auth.body.token)
+            .then(result => {
+              result.should.have.status(201);
+              done();
+            });
         });
     });
 
