@@ -501,7 +501,7 @@ describe('/users/sessions/invalidate_all', () => {
 
   beforeEach(() => {User.create(admin);});
 
-  it('Should should sucessfully invalidate the user sessions', (done) => {
+  it('Should sucessfully invalidate the user sessions', (done) => {
 
     chai.request(server)
       .post('/users/sessions')
