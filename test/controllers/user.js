@@ -5,8 +5,7 @@ const chai = require('chai'),
   expect = chai.expect,
   assert = chai.assert,
   dictum = require('dictum.js'),
-  User = require('../../app/models').users,
-  dotenv = require('dotenv').config({ path: `${__dirname}/.env` });
+  User = require('../../app/models').users;
 
 chai.use(chaiHttp);
 
