@@ -299,9 +299,9 @@ describe('/GET users/albums', () => {
 });
 
 /*
-* Testing the /user/albums/photos (GET) route
+* Testing the /user/albums/:albumId/photos (GET) route
 */
-describe('/GET users/albums/photos', () => {
+describe('/GET users/albums/:albumId/photos', () => {
 
   beforeEach(() => {
     User.create(newUser).then(user => {
@@ -316,13 +316,12 @@ describe('/GET users/albums/photos', () => {
       .post('/users/sessions')
       .send(correctLogin)
       .then(auth => {
-        nock(photoList).get('/1').query(true).reply(200, mockedPhoto);
         chai.request(server)
           .get('/users/albums/1/photos')
           .set('token', auth.body.token)
           .then(res => {
             res.should.have.status(200);
-            res.body.should.include(mockedPhoto);
+            res.body.photos.should.include(mockedPhoto);
             done();
           });
       });

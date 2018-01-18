@@ -91,9 +91,8 @@ exports.photoList = (req, res, next) => {
     if(!album){
       return next(error.notOwned);
     }else{
-      console.log(album.id);
       albumService.getPhotoList(album.id).then(photos => {
-        return res.status(200).send(JSON.parse(photos));
+        return res.status(200).send({photos: JSON.parse(photos)});
       });
     }
 
