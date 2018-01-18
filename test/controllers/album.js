@@ -10,7 +10,8 @@ let chai = require('chai'),
 
 chai.use(chaiHttp);
 
-const url = config.common.urlRequests.albumList;
+const albumList = `${config.common.urlRequests.base}${config.common.urlRequests.albumList}`,
+  photoList = `${config.common.urlRequests.base}${config.common.urlRequests.photoList}`;
 
 const newUser = {
   name: 'Kevin',
@@ -44,6 +45,13 @@ const correctLogin = {
   email: 'kevin.temes@wolox.com',
   password: '12345678'
 };
+const mockedPhoto = {
+  albumId: 1,
+  id: 1,
+  title: 'accusamus beatae ad facilis cum similique qui sunt',
+  url: 'http://placehold.it/600/92c952',
+  thumbnailUrl: 'http://placehold.it/150/92c952'
+};
 
 const adminLogin = {
   email: 'admin@wolox.com.ar',
@@ -63,7 +71,7 @@ describe('/GET albums', () => {
 
   it('should successfully retrieve a list of albums', (done) => {
 
-    nock(url).get('').reply(200, [oneAlbum]);
+    nock(albumList).get('').reply(200, [oneAlbum]);
   
     User.create(newUser).then(res => {
       chai.request(server)
@@ -102,7 +110,7 @@ describe('/GET albums', () => {
 describe('/POST albums', () => {
 
   beforeEach(() => {
-    nock(url).get('/1').query(true).reply(200, oneAlbum);
+    nock(albumList).get('/1').query(true).reply(200, oneAlbum);
   });
 
   it('should successfully purchase an album', (done) => {
@@ -143,7 +151,7 @@ describe('/POST albums', () => {
             .set('token', auth.body.token)
             .then(res => {
               Album.count().then(firstAlbumCount => {
-                nock(url).get('/1').query(true).reply(200, oneAlbum);
+                nock(albumList).get('/1').query(true).reply(200, oneAlbum);
                 chai.request(server)
                   .post('/albums')
                   .send(firstAlbum)
@@ -232,6 +240,7 @@ describe('/GET users/albums', () => {
       .post('/users/sessions')
       .send(correctLogin)
       .then(auth => {
+        nock(photoList).get('/1').query(true).reply(200, mockedPhoto);
         chai.request(server)
           .get(`/users/albums?id=${newUserId}`)
           .set('token', auth.body.token)
@@ -285,6 +294,64 @@ describe('/GET users/albums', () => {
       .catch(err => {
         err.should.have.status(401);
       }).then(() => done());
+  });
+
+});
+
+/*
+* Testing the /user/albums/:albumId/photos (GET) route
+*/
+describe('/GET users/albums/:albumId/photos', () => {
+
+  beforeEach(() => {
+    User.create(newUser).then(user => {
+      Album.create({id: 1, userId: user.id, title: 'test'});
+    });
+    nock(`${photoList}/1`).get('').query(true).reply(200, mockedPhoto);
+  });
+
+  it('should successfully retrieve all the photos of a purchased album', (done) => {
+
+    chai.request(server)
+      .post('/users/sessions')
+      .send(correctLogin)
+      .then(auth => {
+        chai.request(server)
+          .get('/users/albums/1/photos')
+          .set('token', auth.body.token)
+          .then(res => {
+            res.should.have.status(200);
+            res.body.photos.should.include(mockedPhoto);
+            done();
+          });
+      });
+
+  });
+
+  it('should throw an error when requesting the photos of an album not purchased by the user', (done) => {
+    
+    chai.request(server)
+      .post('/users/sessions')
+      .send(correctLogin)
+      .then(auth => {
+        chai.request(server)
+          .get('/users/albums/2/photos')
+          .set('token', auth.body.token)
+          .catch(err => {
+            err.should.have.status(403);
+          }).then(() => done());
+      });
+
+  });
+
+  it('should deny access to the endpoint if the user is not logged in', (done) => {
+
+    chai.request(server)
+      .get('/users/albums/2/photos')
+      .catch(err => {
+        err.should.have.status(401);
+      }).then(() => done());
+
   });
 
 });

@@ -48,7 +48,9 @@ const config = {
       environment: process.env.ROLLBAR_ENV
     },
     urlRequests: {
-      albumList: 'https://jsonplaceholder.typicode.com/albums'
+      base: 'https://jsonplaceholder.typicode.com',
+      albumList: '/albums',
+      photoList: '/photos?albumId='
     }
   }
 };
