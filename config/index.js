@@ -8,10 +8,6 @@ const isObject = variable => {
   return variable instanceof Object;
 };
 
-const duration = (ENVIRONMENT === 'development') || (ENVIRONMENT === 'testing') ? process.env.NODE_API_JWT_SESSION_DURATION_TEST : process.env.NODE_API_JWT_SESSION_DURATION;
-
-const unit = (ENVIRONMENT === 'development') || (ENVIRONMENT === 'testing') ? process.env.NODE_API_JWT_SESSION_DURATION_UNIT_TEST : process.env.NODE_API_JWT_SESSION_DURATION_UNIT;
-
 /*
  * Deep copy of source object into tarjet object.
  * It does not overwrite properties.
@@ -45,9 +41,7 @@ const config = {
     },
     session: {
       header_name: 'token',
-      secret: process.env.NODE_API_JWT_SECRET_STRING,
-      duration,
-      unit
+      secret: process.env.NODE_API_JWT_SECRET_STRING
     },
     rollbar: {
       accessToken: process.env.ROLLBAR_ACCESS_TOKEN,
