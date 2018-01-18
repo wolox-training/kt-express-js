@@ -8,7 +8,7 @@ const isObject = variable => {
   return variable instanceof Object;
 };
 
-const duration = (ENVIRONMENT === 'development') || (ENVIRONMENT === 'testing') ? process.env.NODE_API_JWT_SESSION_DURATION_MINUTES_TEST : process.env.NODE_API_JWT_SESSION_DURATION_MINUTES;
+const duration = (ENVIRONMENT === 'development') || (ENVIRONMENT === 'testing') ? process.env.NODE_API_JWT_SESSION_DURATION_TEST : process.env.NODE_API_JWT_SESSION_DURATION;
 
 const unit = (ENVIRONMENT === 'development') || (ENVIRONMENT === 'testing') ? process.env.NODE_API_JWT_SESSION_DURATION_UNIT_TEST : process.env.NODE_API_JWT_SESSION_DURATION_UNIT;
 
