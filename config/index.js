@@ -49,7 +49,8 @@ const config = {
     },
     urlRequests: {
       albumList: 'https://jsonplaceholder.typicode.com/albums'
-    }
+    },
+    port: process.env.NODE_API_PORT || 8080
   }
 };
 
