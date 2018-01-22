@@ -117,7 +117,8 @@ const newUser = (req, res, next, input) => {
     lastName: input.lastName,
     email: input.email,
     password: input.password,
-    isAdmin: input.isAdmin
+    isAdmin: input.isAdmin,
+    lastInvalidation: moment()
   })
     .then(result => {
 
@@ -176,7 +177,7 @@ exports.invalidateSessions = (req, res, next) => {
 
   logger.info(`User ${req.user.email} requested to invalidate all of their active sessions.`);
 
-  req.user.update({lastInvalidation: Date.now()}).then(updated => {
+  req.user.update({lastInvalidation: moment()}).then(updated => {
 
     logger.info(`All sessions of user ${req.user.email} were successfully invalidated`);
     return res.status(201).send('All sessions successfully invalidated.');

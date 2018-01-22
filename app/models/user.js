@@ -59,7 +59,6 @@ module.exports = (sequelize, DataTypes) => {
     hooks: {
       afterValidate: (user, options) => {
         user.password = bcrypt.hashSync(user.password, bcrypt.genSaltSync(8), null);
-        user.lastInvalidation = moment();
       }
     }
   });
