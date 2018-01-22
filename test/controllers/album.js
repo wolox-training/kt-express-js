@@ -6,7 +6,8 @@ let chai = require('chai'),
   config = require('../../config'),
   dictum = require('dictum.js'),
   User = require('../../app/models').users,
-  Album = require('../../app/models').albums;
+  Album = require('../../app/models').albums,
+  moment = require('moment');
 
 chai.use(chaiHttp);
 
@@ -17,14 +18,16 @@ const newUser = {
   name: 'Kevin',
   lastName: 'Temes',
   email: 'kevin.temes@wolox.com',
-  password: '12345678'
+  password: '12345678',
+  lastInvalidation: moment()
 };
 
 const dummyUser = {
   name: 'Dummy',
   lastName: 'User',
   email: 'dummy.user@wolox.com',
-  password: '12345678'
+  password: '12345678',
+  lastInvalidation: moment()
 };
 
 const oneAlbum = {
@@ -38,7 +41,8 @@ const adminUser = {
   lastName: 'Temes',
   email: 'admin@wolox.com.ar',
   password: '12345678',
-  isAdmin: true
+  isAdmin: true,
+  lastInvalidation: moment()
 };
 
 const correctLogin = {

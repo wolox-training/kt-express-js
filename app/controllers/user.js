@@ -30,8 +30,8 @@ exports.signin = (req, res, next) => {
   if (req.headers.token){
 
     let token = jwt.decode(req.headers.token, config.common.session.secret);
-
-    if(token.email == input.email){
+    
+    if(token.email == req.body.email){
       return res.status(200).send('You are already logged in!');
     }
     
@@ -53,9 +53,10 @@ exports.signin = (req, res, next) => {
         return next(errors.invalidCredentialError);
       }
 
-      const expirationDate = moment().add(config.common.session.duration, config.common.session.unit);
+      const creationDate = moment(),
+        expirationDate = moment().add(config.common.session.duration, config.common.session.unit);
 
-      const token = jwt.encode({email: result.email, expirationDate}, config.common.session.secret);
+      const token = jwt.encode({email: result.email, creationDate, expirationDate}, config.common.session.secret);
       logger.info(`User ${result.email} successfully logged in`);
       return res.status(200).send({
         user:{
@@ -116,7 +117,8 @@ const newUser = (req, res, next, input) => {
     lastName: input.lastName,
     email: input.email,
     password: input.password,
-    isAdmin: input.isAdmin
+    isAdmin: input.isAdmin,
+    lastInvalidation: moment()
   })
     .then(result => {
 
@@ -167,6 +169,22 @@ exports.createAdmin = (req, res, next) => {
   }).catch(err => {
     logger.error(`Unhandled error! details: ${err}`);
     return next(errors.defaultError);
+  });
+
+};
+
+exports.invalidateSessions = (req, res, next) => {
+
+  logger.info(`User ${req.user.email} requested to invalidate all of their active sessions.`);
+
+  req.user.update({lastInvalidation: moment()}).then(updated => {
+
+    logger.info(`All sessions of user ${req.user.email} were successfully invalidated`);
+    return res.status(201).send('All sessions successfully invalidated.');
+
+  }).catch(error => {
+    console.error(`Unhandled error exception! Details: ${error}`);
+    return res.status(500).send(error.message);
   });
 
 };

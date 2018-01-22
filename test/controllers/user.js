@@ -5,7 +5,8 @@ const chai = require('chai'),
   expect = chai.expect,
   assert = chai.assert,
   dictum = require('dictum.js'),
-  User = require('../../app/models').users;
+  User = require('../../app/models').users,
+  moment = require('moment');
 
 chai.use(chaiHttp);
 
@@ -13,19 +14,8 @@ const newUser = {
   name: 'Kevin',
   lastName: 'Temes',
   email: 'kevin.temes@wolox.com.ar',
-  password: '12345678'
-};
-
-const correctLogin = {
-  email: 'kevin.temes@wolox.com.ar',
-  password: '12345678'
-};
-
-const newAdmin = {
-  name: 'Admin',
-  lastName: 'Admin',
-  email: 'admin@wolox.com',
-  password: '12345678'
+  password: '12345678',
+  lastInvalidation: moment()
 };
 
 const admin = {
@@ -33,10 +23,24 @@ const admin = {
   lastName: 'Temes',
   email: 'kevin.temes@wolox.com.ar',
   password: '12345678',
-  isAdmin: true
+  isAdmin: true,
+  lastInvalidation: moment()
+};
+
+const newAdmin = {
+  name: 'Admin',
+  lastName: 'Admin',
+  email: 'admin@wolox.com',
+  password: '12345678',
+  lastInvalidation: moment()
 };
 
 const adminLogin = {
+  email: 'kevin.temes@wolox.com.ar',
+  password: '12345678'
+};
+
+const correctLogin = {
   email: 'kevin.temes@wolox.com.ar',
   password: '12345678'
 };
@@ -473,5 +477,81 @@ describe('Token Expiration', () => {
 
 });
 
+/*
+* Testing the /users/sessions/invalidate_all (POST) route
+*/
 
+describe('/users/sessions/invalidate_all', () => {
 
+  beforeEach(() => {User.create(admin);});
+
+  it('Should sucessfully invalidate the user sessions', (done) => {
+
+    chai.request(server)
+      .post('/users/sessions')
+      .send(adminLogin)
+      .then(auth => {
+        chai.request(server)
+          .post('/users/sessions/invalidate_all')
+          .set('token', auth.body.token)
+          .then(res => {
+            res.should.have.status(201);
+            dictum.chai(res, 'Session Invalidation');
+            done();
+          });
+      });
+
+  });
+
+  it('Should deny access to an endpoint if the user invalidates their sessions, then sends a request with an old token', (done) => {
+
+    chai.request(server)
+      .post('/users/sessions')
+      .send(adminLogin)
+      .then(auth => {
+        chai.request(server)
+          .post('/users/sessions/invalidate_all')
+          .set('token', auth.body.token)
+          .then(res => {
+            chai.request(server)
+              .post('/admin/users')
+              .send(newAdmin)
+              .set('token', auth.body.token)
+              .catch(error => {
+                console.log(error.message);
+                error.should.have.status(403);
+              }).then(() => done());
+          });
+      });
+
+  });
+
+  it('Should allow access to an endpoint if the user logs in after invalidating their sessions', (done) => {
+
+    chai.request(server)
+      .post('/users/sessions')
+      .send(adminLogin)
+      .then(auth => {
+        chai.request(server)
+          .post('/users/sessions/invalidate_all')
+          .set('token', auth.body.token)
+          .then(res => {
+            chai.request(server)
+              .post('/users/sessions')
+              .send(adminLogin)
+              .then(newAuth => {
+                chai.request(server)
+                  .post('/admin/users')
+                  .send(newAdmin)
+                  .set('token', newAuth.body.token)
+                  .then(res => {
+                    res.should.have.status(201);
+                    done();
+                  });
+              });
+          });
+      });
+
+  });
+
+});

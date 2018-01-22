@@ -1,7 +1,8 @@
 'use strict';
 
 const bcrypt = require('bcrypt'),
-  albums = require('../models').albums;
+  albums = require('../models').albums,
+  moment = require('moment');
 
 module.exports = (sequelize, DataTypes) => {
   var user = sequelize.define('users', {
@@ -44,6 +45,10 @@ module.exports = (sequelize, DataTypes) => {
     isAdmin: {
       type: DataTypes.BOOLEAN,
       defaultValue: false
+    },
+    lastInvalidation: {
+      type: DataTypes.DATE,
+      allowNull: true
     }
   }, {
     classMethods: {
