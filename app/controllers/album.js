@@ -2,7 +2,8 @@ const albumService = require('../services/album'),
   albumInteractor = require('../interactors/album'),
   error = require('../errors'),
   logger = require('../logger'),
-  { validationResult } = require('express-validator/check');
+  { validationResult } = require('express-validator/check'),
+  mailer = require('nodemailer');
 
 exports.list = (req, res, next) => {
 
@@ -99,6 +100,64 @@ exports.photoList = (req, res, next) => {
   }).catch(error => {
     logger.error(`Unhandled error exception! Details: ${error.message}`);
     return res.status(500).send(error.message);
+  });
+
+};
+
+exports.emailPhotos = (req, res, next) => {
+
+  logger.info(`User ${req.user.email} requested to receive an email with the photos of an album with ID ${req.params.albumId}`);
+
+  if(!req.params.albumId || isNaN(req.params.albumId)){
+    return next(error.invalidAlbumId);
+  }
+
+  albumInteractor.checkPurchasedAlbum(req.user.id, req.params.albumId).then(album => {
+
+    if(!album){
+      return next(error.notOwned);
+    }else{
+      albumService.getPhotoList(album.id).then(photos => {
+      
+        sendMail(req.user.email, 'Album photo list', photos);
+
+      });
+      return res.status(200).send('Email sent.');
+    }
+
+  }).catch(error => {
+    logger.error(`Unhandled error exception! Details: ${error.message}`);
+    return res.status(500).send(error.message);
+  });
+
+};
+
+const sendMail = (to, subject, message) => {
+
+  mailer.createTestAccount((err, account) => {
+    let transporter = mailer.createTransport({
+      host: 'smtp.ethereal.email',
+      port: 587,
+      secure: false,
+      auth: {
+        user: account.user,
+        pass: account.pass
+      }
+    });
+
+    let mailOptions = {
+      from: '"Wolox" <wolox@wolox.com.ar>',
+      to,
+      subject: subject,
+      text: message,
+    };
+
+    // send mail with defined transport object
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        logger.error(`An error ocurred while trying to send an email: Details: ${error}`);
+      }
+    });
   });
 
 };
