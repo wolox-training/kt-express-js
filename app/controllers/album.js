@@ -116,14 +116,15 @@ exports.emailPhotos = (req, res, next) => {
 
     if(!album){
       return next(error.notOwned);
-    }else{
-      albumService.getPhotoList(album.id).then(photos => {
-      
-        sendMail(req.user.email, 'Album photo list', photos);
-
-      });
-      return res.status(200).send('Email sent.');
     }
+    albumService.getPhotoList(album.id).then(photos => {
+    
+      sendMail(req.user.email, 'Album photo list', photos);
+
+      return res.status(200).send('Email sent.');
+
+    });
+    
 
   }).catch(error => {
     logger.error(`Unhandled error exception! Details: ${error.message}`);

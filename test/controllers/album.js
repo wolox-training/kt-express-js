@@ -359,3 +359,61 @@ describe('/GET users/albums/:albumId/photos', () => {
   });
 
 });
+
+/*
+* Testing the /users/albums/:albumId/emailPhotos (GET) route
+*/
+
+describe('users/albums/:albumId/emailPhotos', () => {
+
+  beforeEach(() => {
+    User.create(newUser).then(user => {
+      Album.create({id: 1, userId: user.id, title: 'test'});
+    });
+    nock(`${photoList}/1`).get('').query(true).reply(200, mockedPhoto);
+  });
+
+  it('Should successfully send a email with the photo list of a purchased album', (done) => {
+
+    chai.request(server)
+      .post('/users/sessions')
+      .send(correctLogin)
+      .then(auth => {
+        chai.request(server)
+          .get('/users/albums/1/emailPhotos')
+          .set('token', auth.body.token)
+          .then(res => {
+            res.should.have.status(200);
+            done();
+          });
+      });
+
+  });
+
+  it('Should throw an error when requesting an email with a the photos from an album not purchased by the user', (done) => {
+    
+    chai.request(server)
+      .post('/users/sessions')
+      .send(correctLogin)
+      .then(auth => {
+        chai.request(server)
+          .get('/users/albums/2/emailPhotos')
+          .set('token', auth.body.token)
+          .catch(err => {
+            err.should.have.status(403);
+          }).then(() => done());
+      });
+  
+  });
+
+  it('should deny access to the endpoint if the user is not logged in', (done) => {
+
+    chai.request(server)
+      .get('/users/albums/1/emailPhotos')
+      .catch(err => {
+        err.should.have.status(401);
+      }).then(() => done());
+
+  });
+
+});
