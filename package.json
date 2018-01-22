@@ -20,6 +20,7 @@
     "pretest": "npm run lint",
     "prestart": "npm run lint",
     "migrations": "./node_modules/.bin/sequelize --config ./config/db.js --migrations-path ./migrations/migrations db:migrate",
+    "seeds": "node ./app/models/scripts/seeds",
     "start": "./node_modules/.bin/nodemon --inspect app.js",
     "test": "npm run migrations && NODE_ENV=testing ./node_modules/mocha/bin/mocha --compilers js:babel-core/register test/app.js && npm run nsp",
     "test-inspect": "NODE_ENV=testing node --inspect --debug-brk ./node_modules/mocha/bin/_mocha --compilers js:babel-core/register test/app.js"
