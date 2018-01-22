@@ -4,7 +4,8 @@ const User = require('../models').users,
   jwt = require('jwt-simple'),
   config = require('../../config'),
   { validationResult } = require('express-validator/check'),
-  bcrypt = require('bcrypt');
+  bcrypt = require('bcrypt'),
+  moment = require('moment');
 
 exports.create = (req, res, next) => {
 
@@ -52,7 +53,9 @@ exports.signin = (req, res, next) => {
         return next(errors.invalidCredentialError);
       }
 
-      const token = jwt.encode({email: result.email}, config.common.session.secret);
+      const expirationDate = moment().add(config.common.session.duration, config.common.session.unit);
+
+      const token = jwt.encode({email: result.email, expirationDate}, config.common.session.secret);
       logger.info(`User ${result.email} successfully logged in`);
       return res.status(200).send({
         user:{
@@ -60,10 +63,10 @@ exports.signin = (req, res, next) => {
           lastName: result.lastName,
           email: result.email
         },
-        token: token
+        token: token,
+        expirationDate
       });
     });
-
 
   }).catch(error => {
     logger.error(`Unhandled error! details: ${error}`);

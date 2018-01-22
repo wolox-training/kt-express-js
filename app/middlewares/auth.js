@@ -2,6 +2,7 @@ const errors = require('../errors'),
   logger = require('../logger'),
   jwt = require('jwt-simple'),
   config = require('../../config'),
+  moment = require('moment'),
   User = require('../models').users;
 
 exports.checkCredentials = (req, res, next) => {
@@ -13,13 +14,15 @@ exports.checkCredentials = (req, res, next) => {
   const token = jwt.decode(req.headers.token, config.common.session.secret);
 
   User.findOne({
-    where: token
+    where: {email: token.email}
   }).then(user => {
 
     if(!user){
       return next(errors.invalidCredentialError);
     }
-
+    if(sessionExpired(token.expirationDate)){
+      return next(errors.sessionExpired);
+    }
     req.user = user;
     next();
   
@@ -33,4 +36,8 @@ exports.isAdmin = (req, res, next, user) => {
     return next(errors.notAnAdmin);
   }
   next();
+};
+
+const sessionExpired = (date) => {
+  return moment().diff(date, config.common.session.unit) > 0;
 };
