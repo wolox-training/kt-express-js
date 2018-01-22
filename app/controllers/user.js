@@ -30,8 +30,8 @@ exports.signin = (req, res, next) => {
   if (req.headers.token){
 
     let token = jwt.decode(req.headers.token, config.common.session.secret);
-
-    if(token.email == input.email){
+    
+    if(token.email == req.body.email){
       return res.status(200).send('You are already logged in!');
     }
     
@@ -53,8 +53,8 @@ exports.signin = (req, res, next) => {
         return next(errors.invalidCredentialError);
       }
 
-      const expirationDate = moment().add(config.common.session.duration, config.common.session.unit);
-      const creationDate = +Date.now();
+      const creationDate = moment(),
+        expirationDate = moment().add(config.common.session.duration, config.common.session.unit);
 
       const token = jwt.encode({email: result.email, creationDate, expirationDate}, config.common.session.secret);
       logger.info(`User ${result.email} successfully logged in`);

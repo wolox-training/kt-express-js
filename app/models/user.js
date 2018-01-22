@@ -1,7 +1,8 @@
 'use strict';
 
 const bcrypt = require('bcrypt'),
-  albums = require('../models').albums;
+  albums = require('../models').albums,
+  moment = require('moment');
 
 module.exports = (sequelize, DataTypes) => {
   var user = sequelize.define('users', {
@@ -58,6 +59,7 @@ module.exports = (sequelize, DataTypes) => {
     hooks: {
       afterValidate: (user, options) => {
         user.password = bcrypt.hashSync(user.password, bcrypt.genSaltSync(8), null);
+        user.lastInvalidation = moment();
       }
     }
   });

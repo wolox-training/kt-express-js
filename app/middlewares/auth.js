@@ -47,5 +47,8 @@ const sessionExpired = (date) => {
 };
 
 const sessionStillValid = (creationDate, lastInvalidation) => {
-  return creationDate > lastInvalidation;
+  const creation = moment(creationDate);
+  const invalidation = moment(lastInvalidation, config.common.session.unit);
+  const diff = creation.diff(lastInvalidation);
+  return moment(creationDate).diff(moment(lastInvalidation, config.common.session.unit)) > 0;
 };

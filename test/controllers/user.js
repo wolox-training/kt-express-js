@@ -41,26 +41,6 @@ const correctLogin = {
   password: '12345678'
 };
 
-const newAdmin = {
-  name: 'Admin',
-  lastName: 'Admin',
-  email: 'admin@wolox.com',
-  password: '12345678'
-};
-
-const admin = {
-  name: 'Kevin',
-  lastName: 'Temes',
-  email: 'kevin.temes@wolox.com.ar',
-  password: '12345678',
-  isAdmin: true
-};
-
-const adminLogin = {
-  email: 'kevin.temes@wolox.com.ar',
-  password: '12345678'
-};
-
 /*
 * Testing the /users (POST) route
 */
