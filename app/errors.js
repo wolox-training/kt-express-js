@@ -53,3 +53,8 @@ exports.sessionExpired = {
   statusCode: 403,
   message: 'You session credentials have expired.'
 };
+
+exports.notOwned = {
+  statusCode: 403,
+  message: 'You must purchase that album first to be able to visualize its photos.'
+};
