@@ -10,7 +10,7 @@ const addUser = (newUser) => {
     return user.update(newUser);
   });
 
-}
+};
 
 const users = [
   addUser({
