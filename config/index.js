@@ -52,6 +52,11 @@ const config = {
       albumList: '/albums',
       photoList: '/photos?albumId='
     },
+    mailer: {
+      host: process.env.NODE_API_MAILER_HOST,
+      port: process.env.NODE_API_MAILER_PORT,
+      from: process.env.NODE_API_MAILER_FROM
+    },
     port: process.env.NODE_API_PORT || 8080
   }
 };

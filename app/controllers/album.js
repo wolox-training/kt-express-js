@@ -3,6 +3,7 @@ const albumService = require('../services/album'),
   error = require('../errors'),
   logger = require('../logger'),
   { validationResult } = require('express-validator/check'),
+  config = require('../../config'),
   mailer = require('nodemailer');
 
 exports.list = (req, res, next) => {
@@ -136,9 +137,9 @@ exports.emailPhotos = (req, res, next) => {
 const sendMail = (to, subject, message) => {
 
   mailer.createTestAccount((err, account) => {
-    let transporter = mailer.createTransport({
-      host: 'smtp.ethereal.email',
-      port: 587,
+    const transporter = mailer.createTransport({
+      host: config.common.mailer.host,
+      port: config.common.mailer.port,
       secure: false,
       auth: {
         user: account.user,
@@ -146,14 +147,13 @@ const sendMail = (to, subject, message) => {
       }
     });
 
-    let mailOptions = {
-      from: '"Wolox" <wolox@wolox.com.ar>',
+    const mailOptions = {
+      from: config.common.mailer.from,
       to,
       subject: subject,
       text: message,
     };
 
-    // send mail with defined transport object
     transporter.sendMail(mailOptions, (error, info) => {
       if (error) {
         logger.error(`An error ocurred while trying to send an email: Details: ${error}`);
